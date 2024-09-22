@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import React, { useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -11,28 +8,22 @@ import {
   StyleSheet 
 } from 'react-native';
 import { 
-  Ionicons, 
-  MaterialCommunityIcons 
+  Ionicons 
 } from '@expo/vector-icons';
-import { 
-  useFonts, 
-  Roboto_400Regular, 
-  Roboto_700Bold 
-} from '@expo-google-fonts/roboto';
 import * as SplashScreen from 'expo-splash-screen';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 
 // Mock data
 const posts = [
   { id: '1', author: 'John Doe', content: 'Just harvested my corn field!', likes: 15, comments: 3 },
   { id: '2', author: 'Jane Smith', content: 'Any tips for dealing with pests in organic farming?', likes: 8, comments: 12 },
-  // Add more mock posts here
 ];
 
 const events = [
   { id: '1', title: 'Annual Farmer\'s Market', date: '2024-10-15', location: 'Central Square' },
   { id: '2', title: 'Sustainable Farming Workshop', date: '2024-11-02', location: 'Community Center' },
-  // Add more mock events here
 ];
 
 // Components
@@ -96,7 +87,7 @@ const ProfileScreen = () => (
   </View>
 );
 
-// Navigation
+// Create navigators
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -126,12 +117,7 @@ const TabNavigator = () => (
   </Tab.Navigator>
 );
 
-const App = () => {
-  let [fontsLoaded] = useFonts({
-    Roboto_400Regular,
-    Roboto_700Bold,
-  });
-
+const Community = () => {
   useEffect(() => {
     async function prepare() {
       await SplashScreen.preventAutoHideAsync();
@@ -139,30 +125,19 @@ const App = () => {
     prepare();
   }, []);
 
-  if (!fontsLoaded) {
-    return null;
-  } else {
-    SplashScreen.hideAsync();
-  }
-
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen 
-          name="FarmerConnect" 
-          component={TabNavigator} 
-          options={{
-            headerStyle: {
-              backgroundColor: '#4CAF50',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontFamily: 'Roboto_700Bold',
-            },
-          }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="FarmerConnect" 
+        component={TabNavigator} 
+        options={{
+          headerStyle: {
+            backgroundColor: '#4CAF50',
+          },
+          headerTintColor: '#fff',
+        }}
+      />
+    </Stack.Navigator>
   );
 };
 
@@ -187,12 +162,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-    fontFamily: 'Roboto_700Bold',
   },
   postContent: {
     fontSize: 14,
     marginBottom: 10,
-    fontFamily: 'Roboto_400Regular',
   },
   postActions: {
     flexDirection: 'row',
@@ -205,7 +178,6 @@ const styles = StyleSheet.create({
   actionText: {
     marginLeft: 5,
     color: '#4CAF50',
-    fontFamily: 'Roboto_400Regular',
   },
   eventCard: {
     padding: 15,
@@ -218,18 +190,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 5,
-    fontFamily: 'Roboto_700Bold',
   },
   eventDate: {
     fontSize: 14,
     color: '#FFFFFF',
     marginBottom: 3,
-    fontFamily: 'Roboto_400Regular',
   },
   eventLocation: {
     fontSize: 14,
     color: '#FFFFFF',
-    fontFamily: 'Roboto_400Regular',
   },
   profileImage: {
     width: 150,
@@ -241,14 +210,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
-    fontFamily: 'Roboto_700Bold',
   },
   profileBio: {
     fontSize: 16,
     textAlign: 'center',
     paddingHorizontal: 20,
-    fontFamily: 'Roboto_400Regular',
   },
 });
 
-export default App;
+export default Community; 

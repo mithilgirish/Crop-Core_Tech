@@ -16,6 +16,8 @@ type RootStackParamList = {
     'Motor Control': undefined;
     'Disease Detection': undefined;
     'Crop Market Trends': undefined;
+    'Ecommerce': undefined;
+    'Community': undefined;
 };
 
 type Navigation = NavigationProp<RootStackParamList>;
@@ -35,8 +37,8 @@ const Navbar = () => {
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Motor Control')}>
                     <MaterialCommunityIcons name="water-pump" size={24} color="black" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Disease Detection')}>
-                    <MaterialCommunityIcons name="account-multiple" size={24} color="black" />
+                <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Ecommerce')}>
+                    <MaterialCommunityIcons name="store" size={24} color="black" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Crop Market Trends')}>
                     <Octicons name="graph" size={24} color="black" />

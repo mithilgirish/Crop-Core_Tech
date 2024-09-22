@@ -29,7 +29,7 @@ const CropMarketTrends: React.FC = () => {
   const renderInfoCard = (title: string, value: string | number, iconName: string) => (
     <Card containerStyle={styles.card}>
       <View style={styles.cardContent}>
-        <Icon name={iconName} type="material-community" size={30} color="#3D6DCC" />
+        <Icon name={iconName} type="material-community" size={30} color="#00cd7c" />
         <View style={styles.cardTextContainer}>
           <Text style={styles.cardTitle}>{title}</Text>
           <Text style={styles.cardValue}>{value}</Text>
@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 50,
+    color: '#00cd7c', // Change picker text color
   },
   card: {
     borderRadius: 10,
@@ -96,15 +97,15 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    color: '#7C7C7C',
+    color: '#00cd7c', // Change card title color
   },
   cardValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#3D6DCC',
+    color: '#00cd7c', // Change card value color
   },
   button: {
-    backgroundColor: '#3D6DCC',
+    backgroundColor: '#00cd7c',
     borderRadius: 10,
     marginHorizontal: 15,
     marginVertical: 20,

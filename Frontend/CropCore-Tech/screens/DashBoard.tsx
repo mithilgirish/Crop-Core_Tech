@@ -14,6 +14,7 @@ type RootStackParamList = {
   'Disease Detection': undefined;
   'Crop Market Trends': undefined;
   Chatbot: undefined;
+  Community :undefined;
 };
 
 type Navigation = NavigationProp<RootStackParamList>;
@@ -47,12 +48,16 @@ const Dashboard: React.FC = () => {
   return (
     <View style={styles.BG}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.header}>Farm Dashboard</Text>
-          <TouchableOpacity style={styles.iconButton} onPress={() => {/* Handle globe button press here */}}>
-            <Feather name="globe" size={24} color="#14251e" />
-          </TouchableOpacity>
-        </View>
+      <View style={styles.headerContainer}>
+  <Text style={styles.headerTitle}>Farm Dashboard</Text>
+  <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Community')}>
+    <Feather name="user" size={24} color="#14251e" />
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Community')}>
+    <Feather name="globe" size={24} color="#14251e" />
+  </TouchableOpacity>
+</View>
+
         <View style={styles.primaryMetrics}>
           <MetricCard title="Temperature" value={25} unit="°C" icon="sun" />
           <MetricCard title="Precipitation" value={35} unit="mm" icon="cloud-rain" />
@@ -115,7 +120,6 @@ interface Styles {
   featureText: TextStyle;
   iconTextContainer: ViewStyle;
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -187,17 +191,25 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'center', // Keep buttons vertically centered
     marginBottom: 10,
+    paddingHorizontal: 10, // Optional: Add padding to the sides
+  },
+  headerTitle: {
+    flex: 1, // Allow the header title to take remaining space
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#14251e',
   },
   iconButton: {
-    padding: 5,
+    padding: 1,
+    marginLeft: 10, // Add spacing between the buttons
   },
   BG: {
     flex: 2,
     backgroundColor: '#F5F5F5',
   },
 });
+
 
 export default Dashboard;
