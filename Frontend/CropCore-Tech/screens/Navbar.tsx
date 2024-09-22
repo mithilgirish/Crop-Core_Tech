@@ -12,6 +12,7 @@ type RootStackParamList = {
     'Disease Detection': undefined;
     'Crop Market Trends': undefined;
     Chatbot: undefined;
+    Ecommerce: undefined;
 };
 
 type Navigation = NavigationProp<RootStackParamList>;
@@ -35,6 +36,9 @@ const Navbar = () => {
                     <Feather name="book-open" size={24} color="black" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Crop Market Trends')}>
+                    <Feather name="trending-up" size={24} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Ecommerce')}>
                     <Feather name="trending-up" size={24} color="black" />
                 </TouchableOpacity>
                 
