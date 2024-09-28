@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
   View,
   Text,
@@ -111,13 +112,20 @@ const MotorControlApp: React.FC = () => {
             keyboardType="numeric"
           />
         </View>
-
         <TouchableOpacity
-          style={styles.button}
-          onPress={() => alert('Notifications enabled for motor alerts.')}
-        >
-          <Text style={styles.buttonText}>Enable Notifications</Text>
-        </TouchableOpacity>
+  style={styles.button}
+  onPress={() => alert('Notifications enabled for motor alerts.')}
+>
+  <LinearGradient
+    colors={['#00cd7c', '#00a745']}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    style={styles.buttonGradient}
+  >
+    <Text style={styles.buttonText}>Enable Notifications</Text>
+  </LinearGradient>
+</TouchableOpacity>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -145,13 +153,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: 'black',
     marginBottom: 15,
   },
   subtitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: 'black',
     marginBottom: 10,
   },
   switchContainer: {
@@ -198,16 +206,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     fontSize: 16,
   },
-  button: {
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  buttonGradient: {
+    padding: 15,
+    alignItems: 'center',
+  },
+  button: {
+    borderRadius: 10,
+    overflow: 'hidden', // This ensures the gradient doesn't spill outside rounded corners
   },
 });
 
