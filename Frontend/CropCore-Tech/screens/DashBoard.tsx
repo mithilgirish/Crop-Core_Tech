@@ -1,106 +1,66 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Dimensions, ViewStyle, TextStyle, TouchableOpacity, StyleProp } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
-type RootStackParamList = {
-  'Get Started': undefined;
-  Dashboard: undefined;
-  'Farming AI': undefined;
-  'Motor Control': undefined;
-  'Disease Detection': undefined;
-  'Crop Market Trends': undefined;
-  Chatbot: undefined;
-  Community: undefined;
-  Profile: undefined;
-  'About Us': undefined;
-  'Contact Us': undefined;
-  'Select Language': undefined;
-  'Share App': undefined;
-  'Talk to Expert': undefined;
-  'Terms of Use': undefined;
-};
-
-type Navigation = NavigationProp<RootStackParamList>;
-
 interface MetricCardProps {
   title: string;
-  value: string | number;
+  value: number;
   unit: string;
-  icon: string;
+  icon: keyof typeof Feather.glyphMap;
+  color: string;
 }
 
-interface MenuItem {
-  icon: string;
-  title: string;
-  screen: keyof RootStackParamList;
-}
+type DashboardScreenNavigationProp = NavigationProp<ParamListBase>;
 
-const menuItems: MenuItem[] = [
-  { icon: 'user', title: 'My Profile', screen: 'Profile' },
-  { icon: 'share-2', title: 'Share the App', screen: 'Share App' },
-  { icon: 'headphones', title: 'Talk to Expert', screen: 'Talk to Expert' },
-  { icon: 'globe', title: 'Select Language', screen: 'Select Language' },
-  { icon: 'file-text', title: 'Terms of Use', screen: 'Terms of Use' },
-];
-
-const MetricCard: React.FC<MetricCardProps> = ({ title, value, unit, icon }) => (
-  <LinearGradient
-    colors={['#00cd7c', '#00a745']}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    style={styles.card}
-  >
-    <Feather name={icon as any} size={24} color="#FFF" style={styles.cardIcon} />
-    <Text style={styles.cardTitle}>{title}</Text>
-    <Text style={styles.cardValue}>
-      {value}
-      <Text style={styles.cardUnit}>{unit}</Text>
+const MetricCard: React.FC<MetricCardProps> = ({ title, value, unit, icon, color }) => (
+  <View style={[styles.metricCard, { backgroundColor: color }]}>
+    <Feather name={icon} size={24} color="#333" />
+    <Text style={styles.metricTitle}>{title}</Text>
+    <Text style={styles.metricValue}>
+      {value}<Text style={styles.metricUnit}>{unit}</Text>
     </Text>
-  </LinearGradient>
+  </View>
+);
+
+const MenuItem: React.FC<{ title: string; icon: keyof typeof Feather.glyphMap; onPress: () => void }> = ({ title, icon, onPress }) => (
+  <TouchableOpacity style={styles.menuItem} onPress={onPress}>
+    <Feather name={icon} size={24} color="#333" />
+    <Text style={styles.menuItemText}>{title}</Text>
+    <Feather name="chevron-right" size={24} color="#333" />
+  </TouchableOpacity>
 );
 
 const Dashboard: React.FC = () => {
-  const navigation = useNavigation<Navigation>();
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuVisible, setMenuVisible] = useState<boolean>(false);
+  const [chatbotVisible, setChatbotVisible] = useState<boolean>(false);
+  const navigation = useNavigation<DashboardScreenNavigationProp>();
 
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible);
+  const toggleMenu = (): void => {
+    setMenuVisible((prev) => !prev);
   };
 
-  const handleNavigation = (screen: keyof RootStackParamList) => {
-    navigation.navigate(screen);
-    setMenuVisible(false);
+  const toggleChatbot = (): void => {
+    setChatbotVisible((prev) => !prev);
   };
 
-  const MenuBar: React.FC = () => (
-    <View style={styles.menuContainer}>
-      <ScrollView>
-        <View style={styles.menuHeader}>
-          <TouchableOpacity onPress={toggleMenu} style={styles.closeButton}>
-            <Feather name="x" size={24} color="#14251e" />
-          </TouchableOpacity>
-          <View style={styles.profileSection}>
-            <View style={styles.avatar}>
-              <Feather name="user" size={24} color="#14251e" />
-            </View>
-            <Text style={styles.username}>Venkatakrishnan</Text>
-          </View>
-        </View>
-        {menuItems.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.menuItem}
-            onPress={() => handleNavigation(item.screen)}
-          >
-            <Feather name={item.icon as any} size={20} color="#14251e" />
-            <Text style={styles.menuItemText}>{item.title}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+  const scrollingMetrics: (MetricCardProps & { id: string })[] = [
+    { id: '1', title: "Nitrogen", value: 180, unit: "ppm", icon: "droplet", color: '#FFDF00' },
+    { id: '2', title: "Phosphorus", value: 150, unit: "ppm", icon: "droplet", color: '#FFDF00' },
+    { id: '3', title: "Potassium", value: 180, unit: "ppm", icon: "droplet", color: '#FFDF00' },
+    { id: '4', title: "pH", value: 6.5, unit: "", icon: "activity", color: '#FFDF00' },
+    { id: '5', title: "Soil Moisture", value: 40, unit: "%", icon: "droplet", color: '#FFDF00' },
+  ];
+
+  const renderScrollingMetric = ({ item }: { item: MetricCardProps & { id: string } }) => (
+    <View style={[styles.scrollingMetricItem, { backgroundColor: item.color }]}>
+      <Feather name={item.icon} size={24} color="#333" />
+      <Text style={styles.scrollingMetricTitle}>{item.title}</Text>
+      <Text style={styles.scrollingMetricValue}>
+        {item.value}<Text style={styles.scrollingMetricUnit}>{item.unit}</Text>
+      </Text>
     </View>
   );
 
@@ -108,52 +68,72 @@ const Dashboard: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.iconButton} onPress={toggleMenu}>
-          <Feather name="menu" size={24} color="#14251e" />
+          <Feather name="menu" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Farm Dashboard</Text>
-        <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Community')}>
-          <Feather name="globe" size={24} color="#14251e" />
+        <TouchableOpacity 
+          style={styles.iconButton} 
+          onPress={() => navigation.navigate('Community' as never)}
+        >
+          <Feather name="globe" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
-      {menuVisible && <MenuBar />}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.primaryMetrics}>
-          <MetricCard title="Temperature" value={25} unit="°C" icon="sun" />
-          <MetricCard title="Precipitation" value={35} unit="mm" icon="cloud-rain" />
-          <MetricCard title="Humidity" value={60} unit="%" icon="droplet" />
-          <MetricCard title="Soil Moisture" value={40} unit="%" icon="filter" />
-          <MetricCard title="Nitrogen" value={200} unit="ppm" icon="triangle" />
-          <MetricCard title="Phosphorus" value={150} unit="ppm" icon="circle" />
-          <MetricCard title="Potassium" value={180} unit="ppm" icon="square" />
-          <MetricCard title="pH Level" value={6.5} unit="" icon="activity" />
+      {menuVisible && (
+        <View style={styles.menuContainer}>
+          <View style={styles.userInfo}>
+            <Image
+              source={{ uri: 'https://via.placeholder.com/50' }}
+              style={styles.userAvatar}
+            />
+            <Text style={styles.userName}>Venkatakrishnan</Text>
+          </View>
+          <MenuItem title="My Profile" icon="user" onPress={() => navigation.navigate('Profile' as never)} />
+          <MenuItem title="Share the App" icon="share-2" onPress={() => {}} />
+          <MenuItem title="Talk to Expert" icon="headphones" onPress={() => {}} />
+          <MenuItem title="Select Language" icon="globe" onPress={() => {}} />
+          <MenuItem title="Terms of Use" icon="file-text" onPress={() => {}} />
         </View>
-        <View style={styles.additionalFeatures}>
-          <TouchableOpacity style={styles.featureButton}>
-            <LinearGradient
-              colors={['#00cd7c', '#00a745']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.featureButton}
-            >
-              <View style={styles.iconTextContainer}>
-                <Feather name="file-text" size={24} color="#FFF" style={styles.ButtonIcon} />
-                <Text style={styles.featureText}>News</Text>
+      )}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.greeting}>Hello User,</Text>
+
+        <View style={styles.metricsContainer}>
+          <MetricCard title="Temperature" value={25} unit="°C" icon="thermometer" color="#E6E6E6" />
+          <MetricCard title="Humidity" value={60} unit="%" icon="droplet" color="#E6E6E6" />
+          <MetricCard title="Precipitation" value={35} unit="mm" icon="cloud-rain" color="#E6E6E6" />
+        </View>
+
+        <View style={styles.scrollingMetricsContainer}>
+          <FlatList
+            data={scrollingMetrics}
+            renderItem={renderScrollingMetric}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.scrollingMetricsList}
+          />
+        </View>
+
+        <TouchableOpacity style={styles.chatbotButton} onPress={toggleChatbot}>
+          <Feather name="message-circle" size={24} color="#FFF" />
+        </TouchableOpacity>
+
+        <View style={styles.newsContainer}>
+          <Text style={styles.newsHeader}>
+            <Feather name="rss" size={20} color="#333" style={styles.newsIcon} /> Agriculture News
+          </Text>
+          {[1, 2, 3, 4].map((item) => (
+            <View key={item} style={styles.newsItem}>
+              <Feather name="file-text" size={16} color="#666" style={styles.newsItemIcon} />
+              <View>
+                <Text style={styles.newsTitle}>News {item}</Text>
+                <Text style={styles.newsContent}>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+                  Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </Text>
               </View>
-            </LinearGradient>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.featureButton} onPress={() => navigation.navigate('Chatbot')}>
-            <LinearGradient
-              colors={['#00cd7c', '#00a745']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.featureButton}
-            >
-              <View style={styles.iconTextContainer}>
-                <Feather name="message-square" size={24} color="#FFF" style={styles.ButtonIcon} />
-                <Text style={styles.featureText}>Chatbot</Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
+            </View>
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -163,32 +143,23 @@ const Dashboard: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 2,
-    backgroundColor: '#F5F5F5',
-  },
-  scrollContent: {
-    padding: 20,
+    marginTop:10,
+    backgroundColor: '#E8F5E9',
   },
   headerContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 10,
-    backgroundColor: '#F5F5F5',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: '#00A86B',
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#14251e',
-    flex: 1,
-    textAlign: 'center',
+    color: '#FFFFFF',
   },
   iconButton: {
-    padding: 10,
+    padding: 5,
   },
   menuContainer: {
     position: 'absolute',
@@ -196,36 +167,28 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     width: '80%',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'white',
     zIndex: 1000,
     elevation: 5,
   },
-  menuHeader: {
-    backgroundColor: '#00cd7c',
-    padding: 20,
-    paddingTop: 40,
-  },
-  closeButton: {
-    alignSelf: 'flex-end',
-  },
-  profileSection: {
+  userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+    backgroundColor: '#00A86B',
   },
-  avatar: {
+  userAvatar: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
+    marginRight: 15,
   },
-  username: {
-    color: '#FFFFFF',
+  userName: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#FFFFFF',
   },
   menuItem: {
     flexDirection: 'row',
@@ -235,63 +198,129 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E0E0E0',
   },
   menuItemText: {
-    marginLeft: 15,
     fontSize: 16,
-    color: '#14251e',
+    marginLeft: 15,
+    flex: 1,
   },
-  primaryMetrics: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  card: {
-    borderRadius: 10,
+  scrollContent: {
     padding: 15,
-    marginBottom: 15,
-    width: (width - 50) / 2,
-    alignItems: 'center',
   },
-  cardIcon: {
-    marginBottom: 10,
-  },
-  cardTitle: {
-    fontSize: 14,
-    color: '#FFF',
-    marginBottom: 5,
-  },
-  cardValue: {
+  greeting: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFF',
+    marginBottom: 20,
   },
-  cardUnit: {
-    fontSize: 14,
-    color: '#FFF',
-  },
-  additionalFeatures: {
+  metricsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
-  featureButton: {
+  metricCard: {
     borderRadius: 10,
     padding: 15,
     alignItems: 'center',
-    justifyContent: 'center',
-    width: (width - 60) / 2,
+    width: (width - 60) / 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
   },
-  iconTextContainer: {
-    flexDirection: 'column',
+  metricTitle: {
+    fontSize: 14,
+    color: '#333',
+    marginTop: 5,
+  },
+  metricValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  metricUnit: {
+    fontSize: 12,
+    color: '#666',
+  },
+  scrollingMetricsContainer: {
+    marginBottom: 20,
+  },
+  scrollingMetricsList: {
+    paddingHorizontal: 5,
+  },
+  scrollingMetricItem: {
+    borderRadius: 10,
+    padding: 15,
+    alignItems: 'center',
+    marginRight: 10,
+    width: 120,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+  },
+  scrollingMetricTitle: {
+    fontSize: 14,
+    color: '#333',
+    marginTop: 5,
+    textAlign: 'center',
+  },
+  scrollingMetricValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  scrollingMetricUnit: {
+    fontSize: 12,
+    color: '#666',
+  },
+  chatbotButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#4CAF50',
+    borderRadius: 30,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    zIndex: 1,
+  },
+  newsContainer: {
+    backgroundColor: '#E0F2F1',
+    borderRadius: 10,
+    padding: 15,
+    marginTop: 20,
+  },
+  newsHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  ButtonIcon: {
-    marginBottom: 5,
+  newsIcon: {
+    marginRight: 5,
   },
-  featureText: {
-    color: '#FFF',
-    marginTop: 5,
+  newsItem: {
+    marginBottom: 15,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  newsItemIcon: {
+    marginRight: 10,
+    marginTop: 2,
+  },
+  newsTitle: {
     fontSize: 16,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#1E90FF',
+  },
+  newsContent: {
+    fontSize: 14,
+    color: '#666',
   },
 });
 
