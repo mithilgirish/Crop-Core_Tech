@@ -9,7 +9,9 @@ import {
   TouchableOpacity,
   SafeAreaView,
   TextInput,
+  Alert,
 } from 'react-native';
+import axios from 'axios';
 
 interface MotorData {
   status: boolean;
@@ -20,6 +22,9 @@ interface MotorData {
   motorPower: number;
   waterFlow: number;
 }
+
+// Define API URLs
+const API_BASE_URL = "http://192.168.0.102:8000/motor/esp32"; // Replace with your Django server IP
 
 const MotorControlApp: React.FC = () => {
   const [motorData, setMotorData] = useState<MotorData>({
@@ -37,7 +42,7 @@ const MotorControlApp: React.FC = () => {
       if (motorData.status) {
         setMotorData((prevData) => ({
           ...prevData,
-          upTime: prevData.upTime + 1,
+          upTime: prevData.upTime + 2,
           powerUsed: prevData.powerUsed + 0.5,
           totalRunTime: prevData.totalRunTime + 1 / 60,
           waterUsed: prevData.waterUsed + prevData.waterFlow,
@@ -48,24 +53,50 @@ const MotorControlApp: React.FC = () => {
     return () => clearInterval(interval);
   }, [motorData.status, motorData.waterFlow]);
 
-  const toggleMotor = () => {
-    setMotorData((prevData) => ({ ...prevData, status: !prevData.status }));
+  const toggleMotor = async () => {
+    const newStatus = !motorData.status;
+    setMotorData((prevData) => ({ ...prevData, status: newStatus }));
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/motor/`, {
+        command: newStatus ? 'ON' : 'OFF',
+      });
+      Alert.alert('Success', response.data.status);
+    } catch (error) {
+      console.error('Error controlling motor:', error);
+      Alert.alert('Error', 'Failed to control motor');
+    }
   };
 
-  const updateMotorPower = (value: string) => {
+  const updateMotorPower = async (value: string) => {
     const numericValue = parseFloat(value);
     if (!isNaN(numericValue) && numericValue >= 0 && numericValue <= 100) {
       setMotorData((prevData) => ({ ...prevData, motorPower: numericValue }));
+      try {
+        const response = await axios.post(`${API_BASE_URL}/motor/power/`, { motorPower: numericValue });
+      } catch (error) {
+        console.error('Error updating motor power:', error);
+        Alert.alert('Error',  'Failed to update motor power');
+      }
+    } else {
+      setMotorData((prevData) => ({ ...prevData, motorPower: 0 }));
     }
   };
-
-  const updateWaterFlow = (value: string) => {
+  
+  const updateWaterFlow = async (value: string) => {
     const numericValue = parseFloat(value);
     if (!isNaN(numericValue) && numericValue >= 0 && numericValue <= 10) {
       setMotorData((prevData) => ({ ...prevData, waterFlow: numericValue }));
+      try {
+        const response = await axios.post(`${API_BASE_URL}/motor/waterflow/`, { waterFlow: numericValue });
+      } catch (error) {
+        console.error('Error updating water flow:', error);
+        Alert.alert('Error', 'Failed to update water flow');
+      }
+    } else {
+      setMotorData((prevData) => ({ ...prevData, waterFlow: 0.0 }));
     }
   };
-
   const DataDisplay = ({ label, value, unit }: { label: string; value: number; unit: string }) => (
     <View style={styles.dataRow}>
       <Text style={styles.dataLabel}>{label}:</Text>
@@ -99,32 +130,19 @@ const MotorControlApp: React.FC = () => {
           <Text style={styles.subtitle}>Controls</Text>
           <Text style={styles.sliderLabel}>Motor Power: {motorData.motorPower.toFixed(0)}%</Text>
           <TextInput
-            style={styles.textInput}
-            value={motorData.motorPower.toFixed(0).toString()}
-            onChangeText={updateMotorPower}
-            keyboardType="numeric"
+          style={styles.textInput}
+          value={motorData.motorPower !== undefined ? motorData.motorPower.toFixed(0):  '0'}
+          onChangeText={(value) => updateMotorPower(value)}
+          keyboardType="numeric"
           />
-          <Text style={styles.sliderLabel}>Water Flow: {motorData.waterFlow.toFixed(1)} L/s</Text>
+          <Text style={styles.sliderLabel}>Water Flow: {motorData.waterFlow.toFixed(2)} L/s</Text>
           <TextInput
-            style={styles.textInput}
-            value={motorData.waterFlow.toFixed(1).toString()}
-            onChangeText={updateWaterFlow}
-            keyboardType="numeric"
-          />
+  style={styles.textInput}
+  value={(motorData.waterFlow !== undefined ? motorData.waterFlow.toFixed(1) : '0.0')}
+  onChangeText={(value) => updateWaterFlow(value)}
+  keyboardType="numeric"
+/>
         </View>
-        <TouchableOpacity
-  style={styles.button}
-  onPress={() => alert('Notifications enabled for motor alerts.')}
->
-  <LinearGradient
-    colors={['#00cd7c', '#00a745']}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    style={styles.buttonGradient}
-  >
-    <Text style={styles.buttonText}>Enable Notifications</Text>
-  </LinearGradient>
-</TouchableOpacity>
 
       </ScrollView>
     </SafeAreaView>
@@ -134,7 +152,7 @@ const MotorControlApp: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop:40,
+    marginTop: 40,
     backgroundColor: '#E8F5E9',
   },
   scrollContent: {
@@ -218,7 +236,7 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 10,
-    overflow: 'hidden', // This ensures the gradient doesn't spill outside rounded corners
+    overflow: 'hidden',
   },
 });
 
