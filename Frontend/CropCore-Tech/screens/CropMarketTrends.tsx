@@ -71,6 +71,7 @@ const CropMarketTrends: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop:30,
     backgroundColor: '#F5F7FA',
   },
   pickerCard: {
