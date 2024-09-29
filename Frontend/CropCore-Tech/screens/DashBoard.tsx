@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions, ViewStyle, TextStyle, TouchableOpacity, StyleProp } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; // Import LinearGradient
+import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 
@@ -14,7 +14,14 @@ type RootStackParamList = {
   'Disease Detection': undefined;
   'Crop Market Trends': undefined;
   Chatbot: undefined;
-  Community :undefined;
+  Community: undefined;
+  Profile: undefined;
+  'About Us': undefined;
+  'Contact Us': undefined;
+  'Select Language': undefined;
+  'Share App': undefined;
+  'Talk to Expert': undefined;
+  'Terms of Use': undefined;
 };
 
 type Navigation = NavigationProp<RootStackParamList>;
@@ -26,12 +33,26 @@ interface MetricCardProps {
   icon: string;
 }
 
+interface MenuItem {
+  icon: string;
+  title: string;
+  screen: keyof RootStackParamList;
+}
+
+const menuItems: MenuItem[] = [
+  { icon: 'user', title: 'My Profile', screen: 'Profile' },
+  { icon: 'share-2', title: 'Share the App', screen: 'Share App' },
+  { icon: 'headphones', title: 'Talk to Expert', screen: 'Talk to Expert' },
+  { icon: 'globe', title: 'Select Language', screen: 'Select Language' },
+  { icon: 'file-text', title: 'Terms of Use', screen: 'Terms of Use' },
+];
+
 const MetricCard: React.FC<MetricCardProps> = ({ title, value, unit, icon }) => (
   <LinearGradient
-    colors={['#00cd7c', '#00a745']} // Gradient colors
+    colors={['#00cd7c', '#00a745']}
     start={{ x: 0, y: 0 }}
     end={{ x: 1, y: 1 }}
-    style={styles.card} // Apply gradient to the card
+    style={styles.card}
   >
     <Feather name={icon as any} size={24} color="#FFF" style={styles.cardIcon} />
     <Text style={styles.cardTitle}>{title}</Text>
@@ -44,20 +65,58 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, unit, icon }) => 
 
 const Dashboard: React.FC = () => {
   const navigation = useNavigation<Navigation>();
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible);
+  };
+
+  const handleNavigation = (screen: keyof RootStackParamList) => {
+    navigation.navigate(screen);
+    setMenuVisible(false);
+  };
+
+  const MenuBar: React.FC = () => (
+    <View style={styles.menuContainer}>
+      <ScrollView>
+        <View style={styles.menuHeader}>
+          <TouchableOpacity onPress={toggleMenu} style={styles.closeButton}>
+            <Feather name="x" size={24} color="#14251e" />
+          </TouchableOpacity>
+          <View style={styles.profileSection}>
+            <View style={styles.avatar}>
+              <Feather name="user" size={24} color="#14251e" />
+            </View>
+            <Text style={styles.username}>Venkatakrishnan</Text>
+          </View>
+        </View>
+        {menuItems.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.menuItem}
+            onPress={() => handleNavigation(item.screen)}
+          >
+            <Feather name={item.icon as any} size={20} color="#14251e" />
+            <Text style={styles.menuItemText}>{item.title}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
 
   return (
-    <View style={styles.BG}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <View style={styles.container}>
       <View style={styles.headerContainer}>
-  <Text style={styles.headerTitle}>Farm Dashboard</Text>
-  <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Community')}>
-    <Feather name="user" size={24} color="#14251e" />
-  </TouchableOpacity>
-  <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Community')}>
-    <Feather name="globe" size={24} color="#14251e" />
-  </TouchableOpacity>
-</View>
-
+        <Text style={styles.headerTitle}>Farm Dashboard</Text>
+        <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Community')}>
+          <Feather name="globe" size={24} color="#14251e" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton} onPress={toggleMenu}>
+          <Feather name="menu" size={24} color="#14251e" />
+        </TouchableOpacity>
+      </View>
+      {menuVisible && <MenuBar />}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.primaryMetrics}>
           <MetricCard title="Temperature" value={25} unit="°C" icon="sun" />
           <MetricCard title="Precipitation" value={35} unit="mm" icon="cloud-rain" />
@@ -68,7 +127,6 @@ const Dashboard: React.FC = () => {
           <MetricCard title="Potassium" value={180} unit="ppm" icon="square" />
           <MetricCard title="pH Level" value={6.5} unit="" icon="activity" />
         </View>
-
         <View style={styles.additionalFeatures}>
           <TouchableOpacity style={styles.featureButton}>
             <LinearGradient
@@ -83,7 +141,6 @@ const Dashboard: React.FC = () => {
               </View>
             </LinearGradient>
           </TouchableOpacity>
-
           <TouchableOpacity style={styles.featureButton} onPress={() => navigation.navigate('Chatbot')}>
             <LinearGradient
               colors={['#00cd7c', '#00a745']}
@@ -103,37 +160,81 @@ const Dashboard: React.FC = () => {
   );
 };
 
-interface Styles {
-  [x: string]: StyleProp<ViewStyle>;
-  container: ViewStyle;
-  scrollContent: ViewStyle;
-  header: TextStyle;
-  sectionHeader: TextStyle;
-  primaryMetrics: ViewStyle;
-  card: ViewStyle;
-  cardIcon: TextStyle;
-  cardTitle: TextStyle;
-  cardValue: TextStyle;
-  cardUnit: TextStyle;
-  additionalFeatures: ViewStyle;
-  featureButton: ViewStyle;
-  featureText: TextStyle;
-  iconTextContainer: ViewStyle;
-}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignContent: 'center',
+    backgroundColor: '#F5F5F5',
   },
   scrollContent: {
-    marginTop: 15,
     padding: 20,
   },
-  header: {
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 10,
+    backgroundColor: '#F5F5F5',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#14251e',
-    marginBottom: 10,
+  },
+  iconButton: {
+    padding: 10,
+  },
+  menuContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    width: '80%',
+    backgroundColor: '#F5F5F5',
+    zIndex: 1000,
+    elevation: 5,
+  },
+  menuHeader: {
+    backgroundColor: '#00cd7c',
+    padding: 20,
+    paddingTop: 40,
+  },
+  closeButton: {
+    alignSelf: 'flex-end',
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  username: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  menuItemText: {
+    marginLeft: 15,
+    fontSize: 16,
+    color: '#14251e',
   },
   primaryMetrics: {
     flexDirection: 'row',
@@ -167,7 +268,7 @@ const styles = StyleSheet.create({
   additionalFeatures: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 0,
+    marginTop: 20,
   },
   featureButton: {
     borderRadius: 10,
@@ -189,27 +290,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center', // Keep buttons vertically centered
-    marginBottom: 10,
-    paddingHorizontal: 10, // Optional: Add padding to the sides
-  },
-  headerTitle: {
-    flex: 1, // Allow the header title to take remaining space
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#14251e',
-  },
-  iconButton: {
-    padding: 1,
-    marginLeft: 10, // Add spacing between the buttons
-  },
-  BG: {
-    flex: 2,
-    backgroundColor: '#F5F5F5',
-  },
 });
-
 
 export default Dashboard;
