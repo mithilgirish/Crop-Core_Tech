@@ -107,12 +107,12 @@ const Dashboard: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
+        <TouchableOpacity style={styles.iconButton} onPress={toggleMenu}>
+          <Feather name="menu" size={24} color="#14251e" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Farm Dashboard</Text>
         <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Community')}>
           <Feather name="globe" size={24} color="#14251e" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton} onPress={toggleMenu}>
-          <Feather name="menu" size={24} color="#14251e" />
         </TouchableOpacity>
       </View>
       {menuVisible && <MenuBar />}
@@ -183,6 +183,8 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#14251e',
+    flex: 1,
+    textAlign: 'center',
   },
   iconButton: {
     padding: 10,
