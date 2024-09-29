@@ -1,18 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
+  Text,
+  TextInput,
+  ActivityIndicator,
   StyleSheet,
-  FlatList,
   KeyboardAvoidingView,
   Platform,
-  TextInput,
   TouchableOpacity,
-  Text,
-  Switch,
-  Modal,
   SafeAreaView,
+  FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 
 interface Message {
   id: string;
@@ -20,141 +20,124 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
-interface ChatbotSettings {
-  darkMode: boolean;
-  voiceInput: boolean;
-  voiceOutput: boolean;
-}
-
-const ChatbotApp: React.FC = () => {
+const ChatbotApp = () => {
+  const navigation = useNavigation<NavigationProp<ParamListBase>>(); // Move this outside of the function
+  const [userText, setUserText] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [settings, setSettings] = useState<ChatbotSettings>({
-    darkMode: false,
-    voiceInput: false,
-    voiceOutput: false,
-  });
-  const [isSettingsVisible, setIsSettingsVisible] = useState(false);
-  const flatListRef = useRef<FlatList>(null);
 
-  useEffect(() => {
-    flatListRef.current?.scrollToEnd({ animated: true });
-  }, [messages]);
+  const API_KEY = "AIzaSyB7B-Ftgk7lSzDXUzZq4Jhj77VBiFbdlIg"; // Replace with your actual API key
 
-  const handleSend = () => {
-    if (inputText.trim() === '') return;
+  const getChatResponse = async () => {
+    if (userText.trim() === '') return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: inputText,
+      text: userText,
       sender: 'user',
     };
 
     setMessages(prevMessages => [...prevMessages, userMessage]);
-    setInputText('');
+    setUserText('');
     setIsLoading(true);
 
-    // Simulate bot response
-    setTimeout(() => {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: userText,
+                  },
+                ],
+              },
+            ],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      let responseText = data.candidates[0].content.parts[0].text;
+
+      // Remove asterisks from the response
+      responseText = responseText.replace(/\*+/g, '');
+
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: 'You said: "${inputText}". This is a simulated bot response.',
+        text: responseText,
         sender: 'bot',
       };
-      setMessages(prevMessages => [...prevMessages, botMessage]);
-      setIsLoading(false);
-    }, 1000);
-  };
 
-  const toggleSetting = (setting: keyof ChatbotSettings) => {
-    setSettings(prevSettings => ({ ...prevSettings, [setting]: !prevSettings[setting] }));
+      setMessages(prevMessages => [...prevMessages, botMessage]);
+    } catch (error) {
+      // Handle error message here if needed
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderMessage = ({ item }: { item: Message }) => (
-    <View style={[
-      styles.messageContainer,
-      item.sender === 'user' ? styles.userMessage : styles.botMessage,
-      settings.darkMode && styles.darkModeMessage,
-    ]}>
-      <Text style={[styles.messageText, settings.darkMode && styles.darkModeText]}>
+    <View style={[styles.messageContainer, item.sender === 'user' ? styles.userMessage : styles.botMessage]}>
+      <Text style={styles.messageText}>
         {item.text}
       </Text>
     </View>
   );
 
   return (
-    <SafeAreaView style={[styles.container, settings.darkMode && styles.darkModeContainer]}>
-      <TouchableOpacity
-        onPress={() => setIsSettingsVisible(true)}
-        style={styles.settingsButton}
-      >
-        <Ionicons name="settings-outline" size={24} color={settings.darkMode ? 'white' : 'black'} />
-      </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.keyboardAvoidingView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.navigate('Dashboard')}
+          >
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>ChatBoat</Text>
+        </View>
+
         <FlatList
-          ref={flatListRef}
           data={messages}
           renderItem={renderMessage}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.messageList}
         />
+        
         <View style={styles.inputContainer}>
           <TextInput
-            style={[styles.input, settings.darkMode && styles.darkModeText]}
-            placeholder="Type a message..."
-            placeholderTextColor={settings.darkMode ? '#888' : '#999'}
-            value={inputText}
-            onChangeText={setInputText}
+            value={userText}
+            onChangeText={setUserText}
+            placeholder="Type your question here..."
+            style={styles.input}
           />
-          {settings.voiceInput && (
-            <TouchableOpacity style={styles.voiceButton}>
-              <Ionicons name="mic" size={24} color="white" />
-            </TouchableOpacity>
-          )}
           <TouchableOpacity
             style={[styles.sendButton, isLoading && styles.disabledButton]}
-            onPress={handleSend}
+            onPress={getChatResponse}
             disabled={isLoading}
           >
             <Ionicons name="send" size={24} color="white" />
           </TouchableOpacity>
         </View>
+        {isLoading && (
+          <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />
+        )}
       </KeyboardAvoidingView>
-      <Modal
-        visible={isSettingsVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsSettingsVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={[styles.modalContent, settings.darkMode && styles.darkModeContainer]}>
-            <Text style={[styles.modalTitle, settings.darkMode && styles.darkModeText]}>Settings</Text>
-            <View style={styles.settingItem}>
-              <Text style={settings.darkMode && styles.darkModeText}>Dark Mode</Text>
-              <Switch value={settings.darkMode} onValueChange={() => toggleSetting('darkMode')} />
-            </View>
-            <View style={styles.settingItem}>
-              <Text style={settings.darkMode && styles.darkModeText}>Voice Input</Text>
-              <Switch value={settings.voiceInput} onValueChange={() => toggleSetting('voiceInput')} />
-            </View>
-            <View style={styles.settingItem}>
-              <Text style={settings.darkMode && styles.darkModeText}>Voice Output</Text>
-              <Switch value={settings.voiceOutput} onValueChange={() => toggleSetting('voiceOutput')} />
-            </View>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setIsSettingsVisible(false)}
-            >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 };
@@ -162,18 +145,28 @@ const ChatbotApp: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
     backgroundColor: '#F0F0F0',
-  },
-  darkModeContainer: {
-    backgroundColor: '#222',
   },
   keyboardAvoidingView: {
     flex: 1,
   },
+  header: {
+    paddingTop: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  headerTitle: {
+    
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
   messageList: {
     paddingVertical: 20,
-    paddingHorizontal: 10,
-    paddingBottom: 80,
   },
   messageContainer: {
     borderRadius: 20,
@@ -189,23 +182,16 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     backgroundColor: 'white',
   },
-  darkModeMessage: {
-    backgroundColor: '#444',
-  },
   messageText: {
     fontSize: 16,
-  },
-  darkModeText: {
-    color: 'white',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    padding: 10,
     backgroundColor: 'white',
     borderTopWidth: 1,
-    paddingBottom: 100,
+    borderRadius: 20,
     borderTopColor: '#e0e0e0',
   },
   input: {
@@ -224,59 +210,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  voiceButton: {
-    backgroundColor: '#FF9500',
-    borderRadius: 25,
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
   disabledButton: {
     opacity: 0.5,
-  },
-  settingsButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 1,
-    padding: 10,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
-    width: '80%',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  closeButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 10,
-    padding: 10,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  closeButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
   },
 });
 

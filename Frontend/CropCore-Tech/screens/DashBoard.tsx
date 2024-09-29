@@ -43,7 +43,8 @@ const Dashboard: React.FC = () => {
   };
 
   const toggleChatbot = (): void => {
-    setChatbotVisible((prev) => !prev);
+    //setChatbotVisible((prev) => !prev);
+    navigation.navigate('Chatbot');
   };
 
   const scrollingMetrics: (MetricCardProps & { id: string })[] = [
@@ -101,7 +102,9 @@ const Dashboard: React.FC = () => {
       )}
       <TouchableOpacity style={styles.chatbotButton} onPress={toggleChatbot}>
           <Feather name="message-circle" size={24} color="#FFF" />
+          
         </TouchableOpacity>
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.greeting}>Hello User,</Text>
 

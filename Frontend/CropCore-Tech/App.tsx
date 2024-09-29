@@ -12,7 +12,7 @@ import FarmingAIScreen from './screens/FarmingAIScreen';
 import MotorControlApp from './screens/MotorControlApp';
 import DiseaseDetectionApp from './screens/DiseaseDetectionApp';
 import CropMarketTrends from './screens/CropMarketTrends';
-import ChatbotInterface from './screens/ChatbotInterface';
+import ChatbotApp from './screens/ChatbotInterface';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Ecomm from './screens/Ecommerce';
@@ -91,11 +91,11 @@ const App = () => {
           <Stack.Screen name="Motor Control" component={MotorControlApp} />
           <Stack.Screen name="Disease Detection" component={DiseaseDetectionApp} />
           <Stack.Screen name="Crop Market Trends" component={CropMarketTrends} />
-          <Stack.Screen name="Chatbot" component={ChatbotInterface} />
+          <Stack.Screen name="Chatbot" component={ChatbotApp} />
           <Stack.Screen name="Ecommerce" component={Ecomm} />
           <Stack.Screen name="Community" component={Community}/>
         </Stack.Navigator>
-        {currentRoute && currentRoute !== "Start" && currentRoute !== "Login" && currentRoute !== "SignUp" && (
+        {currentRoute && currentRoute !== "Start" && currentRoute !== "Login" && currentRoute !== "SignUp" && currentRoute !== "Chatbot" &&(
           <Navbar />
         )}
       </View>
