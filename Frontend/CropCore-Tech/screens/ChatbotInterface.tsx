@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -21,12 +21,12 @@ interface Message {
 }
 
 const ChatbotApp = () => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>(); // Move this outside of the function
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const [userText, setUserText] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const API_KEY = "AIzaSyB7B-Ftgk7lSzDXUzZq4Jhj77VBiFbdlIg"; // Replace with your actual API key
+  const API_KEY = "AIzaSyB7B-Ftgk7lSzDXUzZq4Jhj77VBiFbdlIg";
 
   const getChatResponse = async () => {
     if (userText.trim() === '') return;
@@ -89,7 +89,7 @@ const ChatbotApp = () => {
 
   const renderMessage = ({ item }: { item: Message }) => (
     <View style={[styles.messageContainer, item.sender === 'user' ? styles.userMessage : styles.botMessage]}>
-      <Text style={styles.messageText}>
+      <Text style={[styles.messageText, item.sender === 'user' ? styles.userMessageText : styles.botMessageText]}>
         {item.text}
       </Text>
     </View>
@@ -107,9 +107,9 @@ const ChatbotApp = () => {
             style={styles.backButton}
             onPress={() => navigation.navigate('Dashboard')}
           >
-            <Ionicons name="arrow-back" size={24} color="black" />
+            <Ionicons name="arrow-back" size={24} color="#00A86B" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>ChatBoat</Text>
+          <Text style={styles.headerTitle}>ChatBot</Text>
         </View>
 
         <FlatList
@@ -125,6 +125,7 @@ const ChatbotApp = () => {
             onChangeText={setUserText}
             placeholder="Type your question here..."
             style={styles.input}
+            placeholderTextColor="#999"
           />
           <TouchableOpacity
             style={[styles.sendButton, isLoading && styles.disabledButton]}
@@ -135,7 +136,7 @@ const ChatbotApp = () => {
           </TouchableOpacity>
         </View>
         {isLoading && (
-          <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />
+          <ActivityIndicator size="large" color="#00A86B" style={styles.loadingIndicator} />
         )}
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -145,73 +146,101 @@ const ChatbotApp = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#F7F7F7',
   },
   keyboardAvoidingView: {
     flex: 1,
   },
   header: {
-    paddingTop: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   backButton: {
-    marginRight: 10,
+    marginRight: 15,
   },
   headerTitle: {
-    
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
   },
   messageList: {
     paddingVertical: 20,
+    paddingHorizontal: 16,
   },
   messageContainer: {
     borderRadius: 20,
-    padding: 10,
-    marginVertical: 5,
+    padding: 12,
+    marginVertical: 6,
     maxWidth: '80%',
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 1,
   },
   userMessage: {
     alignSelf: 'flex-end',
-    backgroundColor: '#DCF8C6',
+    backgroundColor: '#00A86B',
   },
   botMessage: {
     alignSelf: 'flex-start',
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
   },
   messageText: {
     fontSize: 16,
+    lineHeight: 22,
+  },
+  userMessageText: {
+    color: '#FFFFFF',
+  },
+  botMessageText: {
+    color: '#333333',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    backgroundColor: 'white',
+    padding: 12,
+    paddingBottom: 50,
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderRadius: 20,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#E0E0E0',
   },
   input: {
     flex: 1,
-    height: 40,
-    marginRight: 10,
-    paddingHorizontal: 10,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    height: 44,
+    marginRight: 12,
+    paddingHorizontal: 16,
+    borderRadius: 22,
+    backgroundColor: '#F0F0F0',
+    color: '#333',
+    fontSize: 16,
   },
   sendButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 25,
-    width: 50,
-    height: 50,
+    backgroundColor: '#00A86B',
+    borderRadius: 22,
+    width: 44,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
   },
   disabledButton: {
     opacity: 0.5,
+  },
+  loadingIndicator: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -25 }, { translateY: -25 }],
   },
 });
 

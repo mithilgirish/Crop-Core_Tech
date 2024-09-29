@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop : 40,
+   // marginTop : 40,
     padding: 15,
     backgroundColor: '#00A86B',
   },

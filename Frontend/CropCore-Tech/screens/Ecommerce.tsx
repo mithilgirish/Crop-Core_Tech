@@ -62,13 +62,7 @@ const Ecomm = () => {
         </View>
       </ScrollView>
 
-      <View style={styles.bottomNav}>
-        <TouchableOpacity><Ionicons name="home" size={24} color="black" /></TouchableOpacity>
-        <TouchableOpacity><Ionicons name="compass" size={24} color="black" /></TouchableOpacity>
-        <TouchableOpacity><Ionicons name="cart" size={24} color="black" /></TouchableOpacity>
-        <TouchableOpacity><Ionicons name="notifications" size={24} color="black" /></TouchableOpacity>
-        <TouchableOpacity><Ionicons name="person" size={24} color="black" /></TouchableOpacity>
-      </View>
+      
     </SafeAreaView>
   );
 };
