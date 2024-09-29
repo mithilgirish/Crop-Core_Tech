@@ -44,16 +44,6 @@ const PostCard = ({ item }: { item: typeof posts[0] }) => (
   </View>
 );
 
-const EventCard = ({ item }: { item: typeof events[0] }) => (
-  <LinearGradient
-    colors={['#4CAF50', '#45a049']}
-    style={styles.eventCard}
-  >
-    <Text style={styles.eventTitle}>{item.title}</Text>
-    <Text style={styles.eventDate}>{item.date}</Text>
-    <Text style={styles.eventLocation}>{item.location}</Text>
-  </LinearGradient>
-);
 
 // Screens
 const HomeScreen = () => (
@@ -66,15 +56,6 @@ const HomeScreen = () => (
   </View>
 );
 
-const EventsScreen = () => (
-  <View style={styles.container}>
-    <FlatList
-      data={events}
-      renderItem={({ item }) => <EventCard item={item} />}
-      keyExtractor={item => item.id}
-    />
-  </View>
-);
 
 const ProfileScreen = () => (
   <View style={styles.container}>
@@ -88,34 +69,8 @@ const ProfileScreen = () => (
 );
 
 // Create navigators
-const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const TabNavigator = () => (
-  <Tab.Navigator
-    screenOptions={({ route }) => ({
-      tabBarIcon: ({ focused, color, size }) => {
-        let iconName: keyof typeof Ionicons.glyphMap;
-
-        if (route.name === 'Home') {
-          iconName = focused ? 'home' : 'home-outline';
-        } else if (route.name === 'Events') {
-          iconName = focused ? 'calendar' : 'calendar-outline';
-        } else {
-          iconName = focused ? 'person' : 'person-outline';
-        }
-
-        return <Ionicons name={iconName} size={size} color={color} />;
-      },
-      tabBarActiveTintColor: '#4CAF50',
-      tabBarInactiveTintColor: 'gray',
-    })}
-  >
-    <Tab.Screen name="Home" component={HomeScreen} />
-    <Tab.Screen name="Events" component={EventsScreen} />
-    <Tab.Screen name="Profile" component={ProfileScreen} />
-  </Tab.Navigator>
-);
 
 const Community = () => {
   useEffect(() => {
@@ -126,18 +81,18 @@ const Community = () => {
   }, []);
 
   return (
-    <Stack.Navigator>
-      <Stack.Screen 
-        name="FarmerConnect" 
-        component={TabNavigator} 
-        options={{
-          headerStyle: {
-            backgroundColor: '#4CAF50',
-          },
-          headerTintColor: '#fff',
-        }}
-      />
-    </Stack.Navigator>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="FarmerConnect"
+          component={HomeScreen}
+          options={{
+            headerStyle: {
+              backgroundColor: '#4CAF50',
+            },
+            headerTintColor: '#fff',
+          }}
+        />
+      </Stack.Navigator>
   );
 };
 

@@ -99,6 +99,9 @@ const Dashboard: React.FC = () => {
           <MenuItem title="Terms of Use" icon="file-text" onPress={() => {}} />
         </View>
       )}
+      <TouchableOpacity style={styles.chatbotButton} onPress={toggleChatbot}>
+          <Feather name="message-circle" size={24} color="#FFF" />
+        </TouchableOpacity>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.greeting}>Hello User,</Text>
 
@@ -107,6 +110,8 @@ const Dashboard: React.FC = () => {
           <MetricCard title="Humidity" value={60} unit="%" icon="droplet" color="#E6E6E6" />
           <MetricCard title="Precipitation" value={35} unit="mm" icon="cloud-rain" color="#E6E6E6" />
         </View>
+
+        
 
         <View style={styles.scrollingMetricsContainer}>
           <FlatList
@@ -119,9 +124,7 @@ const Dashboard: React.FC = () => {
           />
         </View>
 
-        <TouchableOpacity style={styles.chatbotButton} onPress={toggleChatbot}>
-          <Feather name="message-circle" size={24} color="#FFF" />
-        </TouchableOpacity>
+        
 
         <View style={styles.newsContainer}>
           <Text style={styles.newsHeader}>
@@ -154,6 +157,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop : 40,
     padding: 15,
     backgroundColor: '#00A86B',
   },
@@ -212,6 +216,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 15,
+    paddingBottom: 100,
   },
   greeting: {
     fontSize: 24,
@@ -283,7 +288,7 @@ const styles = StyleSheet.create({
   },
   chatbotButton: {
     position: 'absolute',
-    bottom: 65,
+    bottom: 100,
     right: 20,
     backgroundColor: '#4CAF50',
     borderRadius: 30,
