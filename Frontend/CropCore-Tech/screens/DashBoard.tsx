@@ -163,6 +163,7 @@ const Dashboard: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: 20,
     backgroundColor: '#F5F5F5',
   },
   scrollContent: {

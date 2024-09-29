@@ -108,37 +108,6 @@ const FarmingAIScreen = () => {
             </TouchableOpacity>
           </BlurView>
         </View>
-
-        <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>Add a Plant</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Crop Name"
-            value={cropName}
-            onChangeText={setCropName}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Land Area"
-            value={landArea}
-            onChangeText={setLandArea}
-            keyboardType="numeric"
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Previous Yield"
-            value={previousYield}
-            onChangeText={setPreviousYield}
-            keyboardType="numeric"
-          />
-
-          <TouchableOpacity style={styles.addButton} onPress={handleAddPlant}>
-            <Text style={styles.addButtonText}>Add</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </View>
   );
@@ -147,9 +116,9 @@ const FarmingAIScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 2,
-    marginTop: 15,
+    marginTop: 40,
     backgroundColor: '#F5F5F5',
-    padding: 20,
+    padding: 15,
   },
   buttonContainer: {
     flexDirection: 'row',
