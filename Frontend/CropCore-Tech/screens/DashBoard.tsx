@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   },
   chatbotButton: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 65,
     right: 20,
     backgroundColor: '#4CAF50',
     borderRadius: 30,
