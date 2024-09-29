@@ -134,6 +134,7 @@ const MotorControlApp: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop:40,
     backgroundColor: '#E8F5E9',
   },
   scrollContent: {
