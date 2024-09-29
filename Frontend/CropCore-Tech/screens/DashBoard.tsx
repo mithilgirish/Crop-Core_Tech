@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, FlatL
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 interface MetricCardProps {
   title: string;
@@ -66,18 +66,20 @@ const Dashboard: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.iconButton} onPress={toggleMenu}>
-          <Feather name="menu" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Farm Dashboard</Text>
-        <TouchableOpacity 
-          style={styles.iconButton} 
-          onPress={() => navigation.navigate('Community' as never)}
-        >
-          <Feather name="globe" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
+      {!menuVisible && (
+        <View style={styles.headerContainer}>
+          <TouchableOpacity style={styles.iconButton} onPress={toggleMenu}>
+            <Feather name="menu" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Farm Dashboard</Text>
+          <TouchableOpacity 
+            style={styles.iconButton} 
+            onPress={() => navigation.navigate('Community' as never)}
+          >
+            <Feather name="globe" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+      )}
       {menuVisible && (
         <View style={styles.menuContainer}>
           <View style={styles.userInfo}>
@@ -86,6 +88,9 @@ const Dashboard: React.FC = () => {
               style={styles.userAvatar}
             />
             <Text style={styles.userName}>Venkatakrishnan</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
+              <Feather name="x" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
           </View>
           <MenuItem title="My Profile" icon="user" onPress={() => navigation.navigate('Profile' as never)} />
           <MenuItem title="Share the App" icon="share-2" onPress={() => {}} />
@@ -143,7 +148,6 @@ const Dashboard: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop:10,
     backgroundColor: '#E8F5E9',
   },
   headerContainer: {
@@ -189,6 +193,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#FFFFFF',
+    flex: 1,
+  },
+  closeButton: {
+    padding: 5,
   },
   menuItem: {
     flexDirection: 'row',
