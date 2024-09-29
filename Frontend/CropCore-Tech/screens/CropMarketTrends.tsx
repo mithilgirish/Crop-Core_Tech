@@ -1,46 +1,85 @@
 import React, { useState, useMemo } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { ThemeProvider, Button, Card, Text, Icon } from '@rneui/themed';
+import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { ThemeProvider, Card, Text, Icon } from '@rneui/themed';
 import { Picker } from '@react-native-picker/picker';
+import { LineChart } from 'react-native-chart-kit';
 
-type Crop = 'Wheat' | 'Corn' | 'Soybeans' | 'Rice';
+type Crop = 'Onion Small' | 'Tomato Average' | 'Tomato Hybrid';
 
 interface CropData {
-  costOfProduction: number;
-  marketPrice: number;
-  averageYield: number;
+  price: number;
+  change: number;
+  location: string;
+  date: string;
+  historicalPrices: number[];
 }
 
 const cropData: Record<Crop, CropData> = {
-  Wheat: { costOfProduction: 200, marketPrice: 250, averageYield: 50 },
-  Corn: { costOfProduction: 150, marketPrice: 180, averageYield: 180 },
-  Soybeans: { costOfProduction: 300, marketPrice: 350, averageYield: 50 },
-  Rice: { costOfProduction: 250, marketPrice: 300, averageYield: 85 },
+  'Onion Small': {
+    price: 4200,
+    change: -2.33,
+    location: 'Koyambedu',
+    date: '27 September',
+    historicalPrices: [4300, 4250, 4280, 4220, 4200],
+  },
+  'Tomato Average': {
+    price: 3900,
+    change: -2.50,
+    location: 'Koyambedu',
+    date: '27 September',
+    historicalPrices: [4000, 3950, 3920, 3930, 3900],
+  },
+  'Tomato Hybrid': {
+    price: 3800,
+    change: -7.32,
+    location: 'Koyambedu',
+    date: '27 September',
+    historicalPrices: [4100, 4000, 3950, 3880, 3800],
+  },
 };
 
 const CropMarketTrends: React.FC = () => {
-  const [selectedCrop, setSelectedCrop] = useState<Crop>('Wheat');
-
-  const suggestedPrice = useMemo(() => {
-    const { costOfProduction, marketPrice } = cropData[selectedCrop];
-    return parseFloat(((costOfProduction + marketPrice) / 2).toFixed(2));
-  }, [selectedCrop]);
+  const [selectedCrop, setSelectedCrop] = useState<Crop>('Onion Small');
 
   const renderInfoCard = (title: string, value: string | number, iconName: string) => (
-    <Card containerStyle={styles.card}>
-      <View style={styles.cardContent}>
-        <Icon name={iconName} type="material-community" size={30} color="#00cd7c" />
-        <View style={styles.cardTextContainer}>
-          <Text style={styles.cardTitle}>{title}</Text>
-          <Text style={styles.cardValue}>{value}</Text>
-        </View>
+    <View style={styles.infoCard}>
+      <Icon name={iconName} type="material-community" color="#00cd7c" size={24} />
+      <View style={styles.infoTextContainer}>
+        <Text style={styles.infoTitle}>{title}</Text>
+        <Text style={styles.infoValue}>{value}</Text>
       </View>
+    </View>
+  );
+
+  const renderChart = () => (
+    <Card containerStyle={styles.chartCard}>
+      <Card.Title>Price Trend (Last 5 Days)</Card.Title>
+      <LineChart
+        data={{
+          labels: ["5d", "4d", "3d", "2d", "1d"],
+          datasets: [{ data: cropData[selectedCrop].historicalPrices }]
+        }}
+        width={Dimensions.get("window").width - 60}
+        height={220}
+        chartConfig={{
+          backgroundColor: "#ffffff",
+          backgroundGradientFrom: "#ffffff",
+          backgroundGradientTo: "#ffffff",
+          decimalPlaces: 0,
+          color: (opacity = 1) => `rgba(0, 205, 124, ${opacity})`,
+          style: { borderRadius: 16 }
+        }}
+        bezier
+        style={{ marginVertical: 8, borderRadius: 16 }}
+      />
     </Card>
   );
 
   return (
     <ThemeProvider>
       <ScrollView style={styles.container}>
+        <Text style={styles.heading}>Market Trend Analysis</Text>
+
         <Card containerStyle={styles.pickerCard}>
           <Picker
             selectedValue={selectedCrop}
@@ -53,16 +92,26 @@ const CropMarketTrends: React.FC = () => {
           </Picker>
         </Card>
 
-        {renderInfoCard('Cost of Production', `$${cropData[selectedCrop].costOfProduction}`, 'sprout')}
-        {renderInfoCard('Market Price', `$${cropData[selectedCrop].marketPrice}`, 'chart-line')}
-        {renderInfoCard('Average Yield', `${cropData[selectedCrop].averageYield} bu/acre`, 'sprout')}
-        {renderInfoCard('Suggested Price', `$${suggestedPrice}`, 'tag-text-outline')}
+        <Card containerStyle={styles.mainInfoCard}>
+          <Text style={styles.cropName}>{selectedCrop}</Text>
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>₹ {cropData[selectedCrop].price}/Q</Text>
+            <Text style={[styles.change, { color: cropData[selectedCrop].change < 0 ? '#FF4136' : '#2ECC40' }]}>
+              {cropData[selectedCrop].change}%
+            </Text>
+          </View>
+          <Text style={styles.location}>{cropData[selectedCrop].location}</Text>
+          <Text style={styles.date}>{cropData[selectedCrop].date}</Text>
+        </Card>
 
-        <Button
-          title="Refresh Data"
-          buttonStyle={styles.button}
-          icon={<Icon name="refresh" type="material-community" size={20} color="white" />}
-        />
+        <View style={styles.infoCardContainer}>
+          {renderInfoCard('Supply', '1200 tons', 'truck-delivery')}
+          {renderInfoCard('Demand', '1000 tons', 'scale-balance')}
+          {renderInfoCard('Forecast', '↗ Increasing', 'trending-up')}
+          {renderInfoCard('Quality', 'Good', 'check-circle')}
+        </View>
+
+        {renderChart()}
       </ScrollView>
     </ThemeProvider>
   );
@@ -71,8 +120,14 @@ const CropMarketTrends: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop:30,
     backgroundColor: '#F5F7FA',
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginVertical: 20,
   },
   pickerCard: {
     margin: 15,
@@ -81,36 +136,80 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 50,
-    color: '#00cd7c', // Change picker text color
+    color: '#00cd7c',
   },
-  card: {
+  mainInfoCard: {
     borderRadius: 10,
     marginHorizontal: 15,
     marginVertical: 7,
     elevation: 3,
+    padding: 15,
   },
-  cardContent: {
+  cropName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 10,
   },
-  cardTextContainer: {
-    marginLeft: 15,
+  price: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#00cd7c',
   },
-  cardTitle: {
-    fontSize: 16,
-    color: '#00cd7c', // Change card title color
-  },
-  cardValue: {
+  change: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#00cd7c', // Change card value color
+    marginLeft: 10,
   },
-  button: {
-    backgroundColor: '#00cd7c',
+  location: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 5,
+  },
+  date: {
+    fontSize: 14,
+    color: '#999',
+    marginTop: 5,
+  },
+  infoCardContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginHorizontal: 15,
+    marginTop: 15,
+  },
+  infoCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    width: '48%',
+    elevation: 3,
+  },
+  infoTextContainer: {
+    marginLeft: 10,
+  },
+  infoTitle: {
+    fontSize: 14,
+    color: '#666',
+  },
+  infoValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  chartCard: {
     borderRadius: 10,
     marginHorizontal: 15,
-    marginVertical: 20,
-    paddingVertical: 12,
+    marginVertical: 15,
+    elevation: 3,
+    padding: 10,
   },
 });
 
