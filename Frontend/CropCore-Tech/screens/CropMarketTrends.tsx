@@ -1,47 +1,49 @@
-import React, { useState, useMemo } from 'react';
-import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import { ThemeProvider, Card, Text, Icon } from '@rneui/themed';
 import { Picker } from '@react-native-picker/picker';
 import { LineChart } from 'react-native-chart-kit';
-
-type Crop = 'Onion Small' | 'Tomato Average' | 'Tomato Hybrid';
+import axios from 'axios';
 
 interface CropData {
-  price: number;
-  change: number;
-  location: string;
-  date: string;
-  historicalPrices: number[];
+  cropName: string;
+  units: string;
+  wholesalePrice: string;
+  retailPrice: string;
 }
 
-const cropData: Record<Crop, CropData> = {
-  'Onion Small': {
-    price: 4200,
-    change: -2.33,
-    location: 'Koyambedu',
-    date: '27 September',
-    historicalPrices: [4300, 4250, 4280, 4220, 4200],
-  },
-  'Tomato Average': {
-    price: 3900,
-    change: -2.50,
-    location: 'Koyambedu',
-    date: '27 September',
-    historicalPrices: [4000, 3950, 3920, 3930, 3900],
-  },
-  'Tomato Hybrid': {
-    price: 3800,
-    change: -7.32,
-    location: 'Koyambedu',
-    date: '27 September',
-    historicalPrices: [4100, 4000, 3950, 3880, 3800],
-  },
-};
-
 const CropMarketTrends: React.FC = () => {
-  const [selectedCrop, setSelectedCrop] = useState<Crop>('Onion Small');
+  const [crops, setCrops] = useState<CropData[]>([]);
+  const [selectedCrop, setSelectedCrop] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const renderInfoCard = (title: string, value: string | number, iconName: string) => (
+  useEffect(() => {
+    const fetchCropData = async () => {
+      try {
+        const response = await axios.get('http://192.168.0.102:8000/api/market-prices/');
+        const data = response.data.map((item: { [x: string]: any }) => ({
+          cropName: item["CROP NAME"].trim(),
+          units: item.UNITS,
+          wholesalePrice: item["WHOLESALE PRICE"].replace('₹', '').trim(),
+          retailPrice: item["RETAIL PRICE"].replace('₹', '').trim()
+        }));
+        setCrops(data);
+        if (data.length > 0) {
+          setSelectedCrop(data[0].cropName); // Set default selected crop
+        }
+      } catch (error) {
+        console.error('Error fetching crop data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCropData();
+  }, []);
+
+ 
+
+  const renderInfoCard = (title: string, value: string, iconName: string) => (
     <View style={styles.infoCard}>
       <Icon name={iconName} type="material-community" color="#00cd7c" size={24} />
       <View style={styles.infoTextContainer}>
@@ -51,29 +53,47 @@ const CropMarketTrends: React.FC = () => {
     </View>
   );
 
-  const renderChart = () => (
-    <Card containerStyle={styles.chartCard}>
-      <Card.Title>Price Trend (Last 5 Days)</Card.Title>
-      <LineChart
-        data={{
-          labels: ["5d", "4d", "3d", "2d", "1d"],
-          datasets: [{ data: cropData[selectedCrop].historicalPrices }]
-        }}
-        width={Dimensions.get("window").width - 60}
-        height={220}
-        chartConfig={{
-          backgroundColor: "#ffffff",
-          backgroundGradientFrom: "#ffffff",
-          backgroundGradientTo: "#ffffff",
-          decimalPlaces: 0,
-          color: (opacity = 1) => `rgba(0, 205, 124, ${opacity})`,
-          style: { borderRadius: 16 }
-        }}
-        bezier
-        style={{ marginVertical: 8, borderRadius: 16 }}
-      />
-    </Card>
-  );
+  const renderChart = () => {
+    const selectedCropData = crops.find(crop => crop.cropName === selectedCrop);
+    return (
+      <Card containerStyle={styles.chartCard}>
+        <Card.Title>Price Trend (Wholesale vs Retail)</Card.Title>
+        <LineChart
+          data={{
+            labels: ["Wholesale", "Retail"],
+            datasets: [{ 
+              data: [
+                parseFloat(selectedCropData?.wholesalePrice || "0"),
+                parseFloat(selectedCropData?.retailPrice || "0"),
+              ]
+            }]
+          }}
+          width={Dimensions.get("window").width - 60}
+          height={220}
+          chartConfig={{
+            backgroundColor: "#ffffff",
+            backgroundGradientFrom: "#ffffff",
+            backgroundGradientTo: "#ffffff",
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(0, 205, 124, ${opacity})`,
+            style: { borderRadius: 16 }
+          }}
+          bezier
+          style={{ marginVertical: 8, borderRadius: 16 }}
+        />
+      </Card>
+    );
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#00cd7c" />
+      </View>
+    );
+  }
+
+  const selectedCropData = crops.find(crop => crop.cropName === selectedCrop);
 
   return (
     <ThemeProvider>
@@ -83,32 +103,30 @@ const CropMarketTrends: React.FC = () => {
         <Card containerStyle={styles.pickerCard}>
           <Picker
             selectedValue={selectedCrop}
-            onValueChange={(itemValue) => setSelectedCrop(itemValue as Crop)}
+            onValueChange={(itemValue) => setSelectedCrop(itemValue)}
             style={styles.picker}
           >
-            {Object.keys(cropData).map((crop) => (
-              <Picker.Item key={crop} label={crop} value={crop} />
+            {crops.map((crop, index) => (
+              <Picker.Item key={`${crop.cropName}-${index}`} label={crop.cropName} value={crop.cropName} />
             ))}
           </Picker>
         </Card>
 
-        <Card containerStyle={styles.mainInfoCard}>
-          <Text style={styles.cropName}>{selectedCrop}</Text>
-          <View style={styles.priceContainer}>
-            <Text style={styles.price}>₹ {cropData[selectedCrop].price}/Q</Text>
-            <Text style={[styles.change, { color: cropData[selectedCrop].change < 0 ? '#FF4136' : '#2ECC40' }]}>
-              {cropData[selectedCrop].change}%
-            </Text>
-          </View>
-          <Text style={styles.location}>{cropData[selectedCrop].location}</Text>
-          <Text style={styles.date}>{cropData[selectedCrop].date}</Text>
-        </Card>
+        {selectedCropData && (
+          <Card containerStyle={styles.mainInfoCard}>
+            <Text style={styles.cropName}>{selectedCropData.cropName}</Text>
+            <View style={styles.priceContainer}>
+              <Text style={styles.price}>₹ {selectedCropData.wholesalePrice}/{selectedCropData.units}</Text>
+            </View>
+            <Text style={styles.location}>Wholesale Price</Text>
+            <Text style={styles.date}>Last Updated: Today</Text>
+          </Card>
+        )}
 
         <View style={styles.infoCardContainer}>
-          {renderInfoCard('Supply', '1200 tons', 'truck-delivery')}
-          {renderInfoCard('Demand', '1000 tons', 'scale-balance')}
-          {renderInfoCard('Forecast', '↗ Increasing', 'trending-up')}
-          {renderInfoCard('Quality', 'Good', 'check-circle')}
+          {renderInfoCard('Wholesale', `₹ ${selectedCropData?.wholesalePrice || "N/A"}`, 'truck-delivery')}
+          {renderInfoCard('Retail', `₹ ${selectedCropData?.retailPrice || "N/A"}`, 'store')}
+          {renderInfoCard('Units', selectedCropData?.units || "N/A", 'weight')}
         </View>
 
         {renderChart()}
@@ -160,11 +178,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#00cd7c',
   },
-  change: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 10,
-  },
   location: {
     fontSize: 16,
     color: '#666',
@@ -210,6 +223,11 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     elevation: 3,
     padding: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

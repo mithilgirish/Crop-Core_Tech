@@ -62,16 +62,6 @@ data = {
         'Water when dry (Low)',
         'Consistent moisture (Mid)'
     ],
-    'Seed Rate': [
-        '60-80 kg per hectare',
-        'Stem cuttings',
-        '15-20 kg per hectare',
-        '25-30 quintals per hectare',
-        '20-25 kg per hectare',
-        '200-250 grams per hectare',
-        '4-5 kg per hectare',
-        'N/A'
-    ],
     'Fertilizer': [
         'Nitrogen-rich',
         'Phosphorus-rich',
@@ -82,16 +72,6 @@ data = {
         'Phosphorus-rich',
         'Balanced for tea plants'
     ],
-    'Weeding': [
-        'Regularly',
-        'Regularly',
-        'Regularly',
-        'Keep weed-free',
-        'Regularly',
-        'Keep weed-free',
-        'Keep weed-free',
-        'N/A'
-    ],
     'Harvesting': [
         'When grains are hard and golden',
         'When stalks turn yellowish-brown',
@@ -101,26 +81,6 @@ data = {
         'When fruits are red and firm',
         'When tops fall over and bulbs mature',
         'Young leaves every 7-15 days'
-    ],
-    'Disease Management': [
-        'Monitor for Blast, Sheath Blight',
-        'Monitor for Red Rot, Smut',
-        'Check for Fusarium Wilt, Bacterial Blight',
-        'Watch for Late Blight, Early Blight',
-        'Monitor for Corn Rust, Blight',
-        'Check for Late Blight, Mosaic Virus',
-        'Monitor for Downy Mildew, Basal Rot',
-        'Check for Blister Blight, Root Rot'
-    ],
-    'Pest Control': [
-        'Watch for Rice Weevil',
-        'Protect against Sugarcane Borer',
-        'Monitor for Bollworms',
-        'Manage Colorado Potato Beetle',
-        'Watch for Maize Weevil',
-        'Manage Tomato Hornworms',
-        'Watch for Onion Maggots',
-        'Monitor for Tea Mites'
     ]
 }
 
