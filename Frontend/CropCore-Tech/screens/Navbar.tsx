@@ -1,8 +1,13 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+ import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProp } from '@react-navigation/native';
+
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Octicons from 'react-native-vector-icons/Octicons';
 
 // Define the navigation type based on the param list
 type RootStackParamList = {
@@ -11,7 +16,8 @@ type RootStackParamList = {
     'Motor Control': undefined;
     'Disease Detection': undefined;
     'Crop Market Trends': undefined;
-    Chatbot: undefined;
+    'Ecommerce': undefined;
+    'Community': undefined;
 };
 
 type Navigation = NavigationProp<RootStackParamList>;
@@ -23,19 +29,19 @@ const Navbar = () => {
         <View style={styles.container}>
             <View style={styles.pillContainer}>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Dashboard')}>
-                    <Feather name="home" size={24} color="black" />
+                    <Ionicons name="home" size={24} color="black" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Farming AI')}>
-                    <Feather name="crop" size={24} color="black" />
+                    <MaterialIcons name="yard" size={24} color="black" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Motor Control')}>
-                    <Feather name="camera" size={24} color="black" />
+                    <MaterialCommunityIcons name="water-pump" size={24} color="black" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Disease Detection')}>
-                    <Feather name="book-open" size={24} color="black" />
+                <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Ecommerce')}>
+                    <MaterialCommunityIcons name="store" size={24} color="black" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Crop Market Trends')}>
-                    <Feather name="trending-up" size={24} color="black" />
+                    <Octicons name="graph" size={24} color="black" />
                 </TouchableOpacity>
                 
             </View>

@@ -1,87 +1,151 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';  // Import LinearGradient from expo-linear-gradient
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6'
 const FarmingAIScreen = () => {
   const [cropName, setCropName] = useState('');
   const [landArea, setLandArea] = useState('');
   const [previousYield, setPreviousYield] = useState('');
 
   const handleAddPlant = () => {
-    // Implement add plant logic here
     console.log('Adding plant:', { cropName, landArea, previousYield });
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.aiButton}>
-          <Feather name="eye" size={24} color="#FFFFFF" />
-          <Text style={styles.aiButtonText}>AI Weed Detection</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.aiButton}>
-          <Feather name="box" size={24} color="#FFFFFF" />
-          <Text style={styles.aiButtonText}>AI Plant Suggestion</Text>
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.formContainer}>
-        <Text style={styles.formTitle}>Add a Plant</Text>
+    <View style={styles.BG}> 
+      <ScrollView style={styles.container}>
+        <Text style={styles.header}>Crop Care</Text>
         
-        <TextInput
-          style={styles.input}
-          placeholder="Crop Name"
-          value={cropName}
-          onChangeText={setCropName}
-        />
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Land Area"
-          value={landArea}
-          onChangeText={setLandArea}
-          keyboardType="numeric"
-        />
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Previous Yield"
-          value={previousYield}
-          onChangeText={setPreviousYield}
-          keyboardType="numeric"
-        />
-        
-        <TouchableOpacity style={styles.addButton} onPress={handleAddPlant}>
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        <View style={styles.buttonContainer}>
+          <BlurView intensity={50} tint="light" style={styles.blurContainer}>
+            <TouchableOpacity>
+              <LinearGradient
+                colors={['#00cd7c', '#00a745']}  // Gradient colors
+                start={{ x: 0, y: 0 }}           // Gradient start point
+                end={{ x: 1, y: 1 }}             // Gradient end point
+                style={styles.aiButton}          // Apply gradient to button style
+              >
+                <MaterialCommunityIcons name="seed" size={26} color="#FFFFFF" />
+                <Text style={styles.aiButtonText}>Plant Suggestion</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </BlurView>
+
+          <BlurView intensity={50} tint="light" style={styles.blurContainer}>
+            <TouchableOpacity>
+              <LinearGradient
+                colors={['#00cd7c', '#00a745']}  // Gradient colors
+                start={{ x: 0, y: 0 }}           // Gradient start point
+                end={{ x: 1, y: 1 }}             // Gradient end point
+                style={styles.aiButton}          // Apply gradient to button style
+              >
+                <FontAwesome6 name="money-bill-trend-up" size={26} color="#FFFFFF" />
+                <Text style={styles.aiButtonText}>Crop yield</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </BlurView>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <BlurView intensity={50} tint="light" style={styles.blurContainer}>
+            <TouchableOpacity>
+              <LinearGradient
+                colors={['#00cd7c', '#00a745']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.aiButton}
+              >
+                <FontAwesome6 name="disease" size={26} color="#FFFFFF" />
+                <Text style={styles.aiButtonText}>Disease prediction</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </BlurView>
+
+          <BlurView intensity={50} tint="light" style={styles.blurContainer}>
+            <TouchableOpacity>
+              <LinearGradient
+                colors={['#00cd7c', '#00a745']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.aiButton}
+              >
+                <FontAwesome6 name="wheat-awn" size={26} color="#FFFFFF" />
+                <Text style={styles.aiButtonText}>Essential conditions</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </BlurView>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <BlurView intensity={50} tint="light" style={styles.blurContainer}>
+            <TouchableOpacity>
+              <LinearGradient
+                colors={['#00cd7c', '#00a745']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.aiButton}
+              >
+                <MaterialCommunityIcons name="seed-off" size={26} color="#FFFFFF" />
+                <Text style={styles.aiButtonText}>Weed detection</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </BlurView>
+
+          <BlurView intensity={50} tint="light" style={styles.blurContainer}>
+            <TouchableOpacity>
+              <LinearGradient
+                colors={['#00cd7c', '#00a745']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.aiButton}
+              >
+                <MaterialCommunityIcons name="fruit-grapes" size={26} color="#FFFFFF" />
+                <Text style={styles.aiButtonText}>Fruit ripeness</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </BlurView>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 2,
+    marginTop: 40,
     backgroundColor: '#F5F5F5',
-    padding: 20,
+    padding: 15,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 30,
+    marginBottom: 20,
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 10,
+  },
+  blurContainer: {
+    borderRadius: 10,
+    overflow: 'hidden',
+    width: '48%',
   },
   aiButton: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 10,
     padding: 15,
     alignItems: 'center',
-    width: '48%',
+    borderRadius: 10,  // To match the BlurView's rounded corners
   },
   aiButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
-    marginTop: 10,
+    marginTop: 7,
     textAlign: 'center',
   },
   formContainer: {
@@ -108,7 +172,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   addButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00cd7c',
     borderRadius: 5,
     padding: 15,
     alignItems: 'center',
@@ -119,6 +183,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  BG: {
+    flex: 2,
+    backgroundColor: '#F5F5F5',
+  }
 });
 
 export default FarmingAIScreen;
