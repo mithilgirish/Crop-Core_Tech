@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
- import { Feather } from '@expo/vector-icons';
+import { View, TouchableOpacity, StyleSheet, Dimensions, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProp } from '@react-navigation/native';
 
@@ -9,7 +8,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 
-// Define the navigation type based on the param list
 type RootStackParamList = {
     Dashboard: undefined;
     'Farming AI': undefined;
@@ -30,20 +28,24 @@ const Navbar = () => {
             <View style={styles.pillContainer}>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Dashboard')}>
                     <Ionicons name="home" size={24} color="black" />
+                    <Text style={styles.iconText}>Home</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Farming AI')}>
                     <MaterialIcons name="yard" size={24} color="black" />
+                    <Text style={styles.iconText}>Farming AI</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Motor Control')}>
                     <MaterialCommunityIcons name="water-pump" size={24} color="black" />
+                    <Text style={styles.iconText}>Motor</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Ecommerce')}>
                     <MaterialCommunityIcons name="store" size={24} color="black" />
+                    <Text style={styles.iconText}>Store</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Crop Market Trends')}>
                     <Octicons name="graph" size={24} color="black" />
+                    <Text style={styles.iconText}>Trends</Text>
                 </TouchableOpacity>
-                
             </View>
         </View>
     );
@@ -80,8 +82,13 @@ const styles = StyleSheet.create({
     iconContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        width: 40,
-        height: 40,
+        width: 60,
+        height: 50,
+    },
+    iconText: {
+        fontSize: 10,
+        marginTop: 2,
+        textAlign: 'center',
     },
 });
 
