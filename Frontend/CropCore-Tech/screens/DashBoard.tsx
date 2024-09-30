@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,13 +30,12 @@ const MenuItem: React.FC<{ title: string; icon: keyof typeof Feather.glyphMap; o
   <TouchableOpacity style={styles.menuItem} onPress={onPress}>
     <Feather name={icon} size={24} color="#333" />
     <Text style={styles.menuItemText}>{title}</Text>
-    <Feather name="chevron-right" size={24} color="#333" />
   </TouchableOpacity>
 );
 
 const Dashboard: React.FC = () => {
-  const [menuVisible, setMenuVisible] = useState<boolean>(false);
-  const [chatbotVisible, setChatbotVisible] = useState<boolean>(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [chatbotVisible, setChatbotVisible] = useState(false);
   const navigation = useNavigation<DashboardScreenNavigationProp>();
 
   const toggleMenu = (): void => {
@@ -43,7 +43,6 @@ const Dashboard: React.FC = () => {
   };
 
   const toggleChatbot = (): void => {
-    //setChatbotVisible((prev) => !prev);
     navigation.navigate('Chatbot');
   };
 
@@ -69,53 +68,40 @@ const Dashboard: React.FC = () => {
     <View style={styles.container}>
       {!menuVisible && (
         <View style={styles.headerContainer}>
-          <TouchableOpacity style={styles.iconButton} onPress={toggleMenu}>
+          <TouchableOpacity onPress={toggleMenu} style={styles.iconButton}>
             <Feather name="menu" size={24} color="#FFFFFF" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Farm Dashboard</Text>
-          <TouchableOpacity 
-            style={styles.iconButton} 
-            onPress={() => navigation.navigate('Community' as never)}
-          >
-            <Feather name="globe" size={24} color="#FFFFFF" />
+          <TouchableOpacity onPress={() => navigation.navigate('Community' as never)} style={styles.iconButton}>
+            <Feather name="users" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       )}
       {menuVisible && (
         <View style={styles.menuContainer}>
           <View style={styles.userInfo}>
-            <Image
-              source={{ uri: 'https://via.placeholder.com/50' }}
-              style={styles.userAvatar}
-            />
+            <Image source={{ uri: 'https://example.com/avatar.jpg' }} style={styles.userAvatar} />
             <Text style={styles.userName}>Venkatakrishnan</Text>
-            <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
+            <TouchableOpacity onPress={toggleMenu} style={styles.closeButton}>
               <Feather name="x" size={24} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
-          <MenuItem title="My Profile" icon="user" onPress={() => navigation.navigate('Profile' as never)} />
+          <MenuItem title="Profile" icon="user" onPress={() => navigation.navigate('Profile' as never)} />
           <MenuItem title="Share the App" icon="share-2" onPress={() => {}} />
-          <MenuItem title="Talk to Expert" icon="headphones" onPress={() => {}} />
+          <MenuItem title="Talk to Experts" icon="headphones" onPress={() => {}} />
           <MenuItem title="Select Language" icon="globe" onPress={() => {}} />
-          <MenuItem title="Terms of Use" icon="file-text" onPress={() => {}} />
+	  <MenuItem title="Terms of Use" icon="file-text" onPress={() => {}} />
+          <MenuItem title="Premium" icon="star" onPress={() => {}} />
+          <MenuItem title="About Us" icon="info" onPress={() => {}} />
         </View>
       )}
-      <TouchableOpacity style={styles.chatbotButton} onPress={toggleChatbot}>
-          <Feather name="message-circle" size={24} color="#FFF" />
-          
-        </TouchableOpacity>
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={styles.scrollContent}>
         <Text style={styles.greeting}>Hello User,</Text>
-
         <View style={styles.metricsContainer}>
-          <MetricCard title="Temperature" value={25} unit="°C" icon="thermometer" color="#E6E6E6" />
-          <MetricCard title="Humidity" value={60} unit="%" icon="droplet" color="#E6E6E6" />
-          <MetricCard title="Precipitation" value={35} unit="mm" icon="cloud-rain" color="#E6E6E6" />
+          <MetricCard title="Temperature" value={25} unit="°C" icon="thermometer" color="#FFB74D" />
+          <MetricCard title="Humidity" value={60} unit="%" icon="droplet" color="#4FC3F7" />
+          <MetricCard title="Light" value={800} unit="lux" icon="sun" color="#FFF176" />
         </View>
-
-        
-
         <View style={styles.scrollingMetricsContainer}>
           <FlatList
             data={scrollingMetrics}
@@ -126,16 +112,14 @@ const Dashboard: React.FC = () => {
             contentContainerStyle={styles.scrollingMetricsList}
           />
         </View>
-
-        
-
         <View style={styles.newsContainer}>
-          <Text style={styles.newsHeader}>
-            <Feather name="rss" size={20} color="#333" style={styles.newsIcon} /> Agriculture News
-          </Text>
+          <View style={styles.newsHeader}>
+            <MaterialCommunityIcons name="newspaper-variant-outline" size={24} color="#333" style={styles.newsIcon} />
+            <Text>Agriculture News</Text>
+          </View>
           {[1, 2, 3, 4].map((item) => (
             <View key={item} style={styles.newsItem}>
-              <Feather name="file-text" size={16} color="#666" style={styles.newsItemIcon} />
+              <MaterialCommunityIcons name="leaf" size={20} color="#4CAF50" style={styles.newsItemIcon} />
               <View>
                 <Text style={styles.newsTitle}>News {item}</Text>
                 <Text style={styles.newsContent}>
@@ -147,6 +131,9 @@ const Dashboard: React.FC = () => {
           ))}
         </View>
       </ScrollView>
+      <TouchableOpacity style={styles.chatbotButton} onPress={toggleChatbot}>
+        <Feather name="message-circle" size={30} color="#FFFFFF" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -154,13 +141,14 @@ const Dashboard: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding:0,
+    marginTop:0,
     backgroundColor: '#E8F5E9',
   },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-   // marginTop : 40,
     padding: 15,
     backgroundColor: '#00A86B',
   },
