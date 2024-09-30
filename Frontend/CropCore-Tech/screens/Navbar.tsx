@@ -32,7 +32,7 @@ const Navbar = () => {
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Farming AI')}>
                     <MaterialIcons name="yard" size={24} color="black" />
-                    <Text style={styles.iconText}>Farming AI</Text>
+                    <Text style={styles.iconText}>Crop Care</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Motor Control')}>
                     <MaterialCommunityIcons name="water-pump" size={24} color="black" />
