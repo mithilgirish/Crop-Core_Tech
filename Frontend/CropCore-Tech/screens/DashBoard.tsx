@@ -99,7 +99,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleTalkToExperts = () => {
-    Linking.openURL('tel:+1234567890');
+    Linking.openURL('tel:+919940332309');
   };
 
   const handleSelectLanguage = () => {
@@ -135,8 +135,8 @@ const Dashboard: React.FC = () => {
       {menuVisible && (
         <View style={styles.menuContainer}>
           <View style={styles.userInfo}>
-            <Image source={{ uri: 'https://example.com/avatar.jpg' }} style={styles.userAvatar} />
-            <Text style={styles.userName}>Venkatakrishnan</Text>
+            <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/en/b/b7/Billy_Butcher.jpg' }} style={styles.userAvatar} />
+            <Text style={styles.userName}>Billy Butcher</Text>
             <TouchableOpacity onPress={toggleMenu} style={styles.closeButton}>
               <Feather name="x" size={24} color={COLORS.text.primary} />
             </TouchableOpacity>
@@ -151,7 +151,7 @@ const Dashboard: React.FC = () => {
       )}
 
       <ScrollView style={styles.scrollContent}>
-        <Text style={styles.greeting}>Hello User,</Text>
+        <Text style={styles.greeting}>Hello Billy,</Text>
         <View style={styles.metricsContainer}>
           <MetricCard title="Temperature" value={25} unit="°C" icon="thermometer" color={COLORS.card.start} />
           <MetricCard title="Humidity" value={60} unit="%" icon="droplet" color={COLORS.card.start} />
@@ -203,9 +203,9 @@ const Dashboard: React.FC = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>User Profile</Text>
-            <Image source={{ uri: 'https://example.com/avatar.jpg' }} style={styles.modalAvatar} />
-            <Text style={styles.modalText}>Name: Venkatakrishnan</Text>
-            <Text style={styles.modalText}>Email: venkat@example.com</Text>
+            <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/en/b/b7/Billy_Butcher.jpg' }} style={styles.modalAvatar} />
+            <Text style={styles.modalText}>Name: Billy Butcher</Text>
+            <Text style={styles.modalText}>Email: billy@gmail.com</Text>
             <Text style={styles.modalText}>Farm Size: 50 acres</Text>
             <TouchableOpacity style={styles.modalButton} onPress={() => setProfileModalVisible(false)}>
               <Text style={styles.modalButtonText}>Close</Text>
