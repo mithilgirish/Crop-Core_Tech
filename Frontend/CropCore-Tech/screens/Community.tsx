@@ -179,7 +179,7 @@ const CommunityScreen: React.FC = () => {
       ) : (
         <>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Reddit-like Community</Text>
+            <Text style={styles.headerTitle}>Community</Text>
           </View>
           <FlatList
             data={posts}

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Dimensions, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProp } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -25,28 +26,33 @@ const Navbar = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.pillContainer}>
+            <LinearGradient
+                colors={['#E0F7FA', '#B2EBF2', '#80DEEA']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.pillContainer}
+            >
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Dashboard')}>
-                    <Ionicons name="home" size={24} color="black" />
+                    <Ionicons name="home" size={24} color="#006064" />
                     <Text style={styles.iconText}>Home</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Farming AI')}>
-                    <MaterialIcons name="yard" size={24} color="black" />
+                    <MaterialIcons name="yard" size={24} color="#00796B" />
                     <Text style={styles.iconText}>Crop Care</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Motor Control')}>
-                    <MaterialCommunityIcons name="water-pump" size={24} color="black" />
+                    <MaterialCommunityIcons name="water-pump" size={24} color="#0277BD" />
                     <Text style={styles.iconText}>Motor</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Ecommerce')}>
-                    <MaterialCommunityIcons name="store" size={24} color="black" />
+                    <MaterialCommunityIcons name="store" size={24} color="#1565C0" />
                     <Text style={styles.iconText}>Store</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Crop Market Trends')}>
-                    <Octicons name="graph" size={24} color="black" />
+                    <Octicons name="graph" size={24} color="#303F9F" />
                     <Text style={styles.iconText}>Trends</Text>
                 </TouchableOpacity>
-            </View>
+            </LinearGradient>
         </View>
     );
 };
@@ -63,7 +69,6 @@ const styles = StyleSheet.create({
     },
     pillContainer: {
         flexDirection: 'row',
-        backgroundColor: '#E0FFFF',
         borderRadius: 30,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -89,6 +94,8 @@ const styles = StyleSheet.create({
         fontSize: 10,
         marginTop: 2,
         textAlign: 'center',
+        color: '#006064',
+        fontWeight: '600',
     },
 });
 
