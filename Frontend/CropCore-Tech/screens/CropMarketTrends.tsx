@@ -8,7 +8,7 @@ import { LineChart } from 'react-native-chart-kit';
 const COLORS = {
   primary: '#1E88E5',
   secondary: '#3949AB',
-  accent: '#4CAF50',  // Changed to a greenish color
+  accent: '#4CAF50',
   background: {
     start: '#1A237E',
     end: '#121212',
@@ -20,6 +20,10 @@ const COLORS = {
   text: {
     primary: '#FFFFFF',
     secondary: '#B0BEC5',
+  },
+  graph: {
+    background: '#000000',
+    line: '#39FF14',  // Neon green
   },
 };
 
@@ -133,9 +137,11 @@ const MarketTrendAnalysis: React.FC = () => {
           width={120}
           height={60}
           chartConfig={{
-            backgroundGradientFrom: COLORS.card.start,
-            backgroundGradientTo: COLORS.card.end,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            backgroundColor: COLORS.graph.background,
+            backgroundGradientFrom: COLORS.graph.background,
+            backgroundGradientTo: COLORS.graph.background,
+            color: (opacity = 1) => COLORS.graph.line,
+            strokeWidth: 2,
           }}
           bezier
           style={styles.miniChart}
@@ -222,18 +228,20 @@ const MarketTrendAnalysis: React.FC = () => {
               width={Dimensions.get('window').width - 60}
               height={220}
               chartConfig={{
-                backgroundGradientFrom: COLORS.card.start,
-                backgroundGradientTo: COLORS.card.end,
-                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                backgroundColor: COLORS.graph.background,
+                backgroundGradientFrom: COLORS.graph.background,
+                backgroundGradientTo: COLORS.graph.background,
+                color: (opacity = 1) => COLORS.graph.line,
+                labelColor: (opacity = 1) => COLORS.text.primary,
                 style: {
                   borderRadius: 16
                 },
                 propsForDots: {
                   r: "6",
                   strokeWidth: "2",
-                  stroke: COLORS.accent
-                }
+                  stroke: COLORS.graph.line
+                },
+                strokeWidth: 2,
               }}
               bezier
               style={styles.chart}
