@@ -134,7 +134,7 @@ const MotorControlApp: React.FC = () => {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <LinearGradient colors={[COLORS.card.start, COLORS.card.end]} style={styles.card}>
             <View style={styles.titleContainer}>
-              <Text style={styles.title}>Motor Control</Text>
+              <Text style={styles.title}>Motor Control </Text>
               <Icon name="engine" size={30} color={COLORS.accent} />
             </View>
             <View style={styles.switchContainer}>

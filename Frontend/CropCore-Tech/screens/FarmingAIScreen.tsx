@@ -53,7 +53,7 @@ const FarmingAIScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Crop Care</Text>
+      <Text style={styles.header}>Crop Care 🌾</Text>
       
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.cardsWrapper}>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, FlatList, Image, Linking, Modal } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -61,6 +61,10 @@ const MenuItem: React.FC<{ title: string; icon: keyof typeof Feather.glyphMap; o
 const Dashboard: React.FC = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [chatbotVisible, setChatbotVisible] = useState(false);
+  const [profileModalVisible, setProfileModalVisible] = useState(false);
+  const [termsModalVisible, setTermsModalVisible] = useState(false);
+  const [premiumModalVisible, setPremiumModalVisible] = useState(false);
+  const [aboutUsModalVisible, setAboutUsModalVisible] = useState(false);
   const navigation = useNavigation<DashboardScreenNavigationProp>();
 
   const toggleMenu = (): void => {
@@ -90,6 +94,30 @@ const Dashboard: React.FC = () => {
     </LinearGradient>
   );
 
+  const handleProfile = () => {
+    setProfileModalVisible(true);
+  };
+
+  const handleTalkToExperts = () => {
+    Linking.openURL('tel:+1234567890');
+  };
+
+  const handleSelectLanguage = () => {
+    // Existing functionality
+  };
+
+  const handleTermsOfUse = () => {
+    setTermsModalVisible(true);
+  };
+
+  const handlePremium = () => {
+    setPremiumModalVisible(true);
+  };
+
+  const handleAboutUs = () => {
+    setAboutUsModalVisible(true);
+  };
+
   return (
     <LinearGradient colors={[COLORS.background.start, COLORS.background.end]} style={styles.backgroundGradient}>
       {!menuVisible && (
@@ -97,8 +125,8 @@ const Dashboard: React.FC = () => {
           <TouchableOpacity onPress={toggleMenu} style={styles.iconButton}>
             <Feather name="menu" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Farm Dashboard</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Community' as never)} style={styles.iconButton}>
+          <Text style={styles.headerTitle}>Farm Dashboard 🏡</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Community')} style={styles.iconButton}>
             <Feather name="users" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
         </View>
@@ -113,13 +141,12 @@ const Dashboard: React.FC = () => {
               <Feather name="x" size={24} color={COLORS.text.primary} />
             </TouchableOpacity>
           </View>
-          <MenuItem title="Profile" icon="user" onPress={() => navigation.navigate('Profile' as never)} />
-          <MenuItem title="Share the App" icon="share-2" onPress={() => {}} />
-          <MenuItem title="Talk to Experts" icon="headphones" onPress={() => {}} />
-          <MenuItem title="Select Language" icon="globe" onPress={() => {}} />
-          <MenuItem title="Terms of Use" icon="file-text" onPress={() => {}} />
-          <MenuItem title="Premium" icon="star" onPress={() => {}} />
-          <MenuItem title="About Us" icon="info" onPress={() => {}} />
+          <MenuItem title="Profile" icon="user" onPress={handleProfile} />
+          <MenuItem title="Talk to Experts" icon="headphones" onPress={handleTalkToExperts} />
+          <MenuItem title="Select Language" icon="globe" onPress={handleSelectLanguage} />
+          <MenuItem title="Terms of Use" icon="file-text" onPress={handleTermsOfUse} />
+          <MenuItem title="Premium" icon="star" onPress={handlePremium} />
+          <MenuItem title="About Us" icon="info" onPress={handleAboutUs} />
         </View>
       )}
 
@@ -165,6 +192,92 @@ const Dashboard: React.FC = () => {
       <TouchableOpacity style={styles.chatbotButton} onPress={toggleChatbot}>
         <Feather name="message-circle" size={30} color={COLORS.text.primary} />
       </TouchableOpacity>
+
+      {/* Profile Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={profileModalVisible}
+        onRequestClose={() => setProfileModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>User Profile</Text>
+            <Image source={{ uri: 'https://example.com/avatar.jpg' }} style={styles.modalAvatar} />
+            <Text style={styles.modalText}>Name: Venkatakrishnan</Text>
+            <Text style={styles.modalText}>Email: venkat@example.com</Text>
+            <Text style={styles.modalText}>Farm Size: 50 acres</Text>
+            <TouchableOpacity style={styles.modalButton} onPress={() => setProfileModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Terms of Use Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={termsModalVisible}
+        onRequestClose={() => setTermsModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <ScrollView style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Terms of Use</Text>
+            <Text style={styles.modalText}>
+              By accessing CropCore-Tech mobile application (henceforth 'the Application' or 'App' or 'CropCore-Tech' interchangeably), which is owned, operated and managed by Team Cache Me (hereinafter referred to as "The Company", "we" or "us"), it is understood that you have read, understood and agree to be bound by the terms of the following user agreement and disclaimers. Please bring to our attention any content on the Application you believe to be inaccurate, inappropriate or in violation of these terms. Please write to us at cachemecacheme@gmail.com.
+
+              Acceptance of Terms of Use
+
+              If you do not agree to these terms, please do not install this Mobile Application. Please note that we may change the Terms of Use from time to time. Please review these terms periodically and if you do not agree to any changes made in the terms of use, please stop using the Application immediately. If you continue to use, it means that you accept the extant terms of use. In case of a discrepancy between the English version of these terms and any other language version, the English version will be considered as correct.
+            </Text>
+            <TouchableOpacity style={styles.modalButton} onPress={() => setTermsModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Close</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Premium Features Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={premiumModalVisible}
+        onRequestClose={() => setPremiumModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Premium Features</Text>
+            <Text style={styles.modalSubtitle}>Unlock advanced agricultural insights:</Text>
+            <Text style={styles.modalText}>• Detailed NPK analysis</Text>
+            <Text style={styles.modalText}>• Real-time pH monitoring</Text>
+            <Text style={styles.modalText}>• Precise soil moisture tracking</Text>
+            <TouchableOpacity style={styles.modalButton} onPress={() => setPremiumModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* About Us Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={aboutUsModalVisible}
+        onRequestClose={() => setAboutUsModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>About CropCore-Tech</Text>
+            <Text style={styles.modalText}>
+              CropCore-Tech is a cutting-edge mobile application designed to empower farmers with real-time agricultural insights and data-driven decision-making tools. Our mission is to revolutionize farming practices by leveraging technology to increase crop yields, optimize resource usage, and promote sustainable agriculture.
+            </Text>
+            <TouchableOpacity style={styles.modalButton} onPress={() => setAboutUsModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 };
@@ -339,7 +452,59 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 50,
     elevation: 5,
-    marginBottom: 85,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    marginBottom:30,
+  },
+  modalContent: {
+    backgroundColor: COLORS.menu.background,
+    borderRadius: 20,
+    padding: 20,
+    width: '90%',
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.text.primary,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text.primary,
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    color: COLORS.text.secondary,
+    marginBottom: 10,
+    lineHeight: 24,
+  },
+  modalButton: {
+    backgroundColor: COLORS.primary,
+    padding: 10,
+    borderRadius: 5,
+    alignSelf: 'center',
+    marginTop: 20,
+    marginBottom:40,
+  },
+  modalButtonText: {
+    color: COLORS.text.primary,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalAvatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
 });
 

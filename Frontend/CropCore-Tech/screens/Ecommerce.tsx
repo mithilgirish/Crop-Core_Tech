@@ -89,11 +89,8 @@ const PRODUCTS: Product[] = [
 // Components
 const Header: React.FC<{ onCartPress: () => void }> = ({ onCartPress }) => (
   <View style={styles.header}>
-    <Text style={styles.logo}>AgriMarket</Text>
+    <Text style={styles.logo}>Crop Core Market 🛍️</Text>
     <View style={styles.iconContainer}>
-      <TouchableOpacity>
-        <Text style={styles.icon}>❤️</Text>
-      </TouchableOpacity>
       <TouchableOpacity onPress={onCartPress}>
         <Text style={styles.icon}>🛒</Text>
       </TouchableOpacity>
