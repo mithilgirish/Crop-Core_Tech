@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   userAvatar: {
     width: 50,
     height: 50,
-    borderRadius: 25,
+    borderRadius: 26,
     marginRight: 15,
   },
   userName: {
