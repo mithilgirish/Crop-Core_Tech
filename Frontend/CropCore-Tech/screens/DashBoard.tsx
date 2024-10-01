@@ -4,6 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
+import MapView, { Marker } from 'react-native-maps';
 
 const { width, height } = Dimensions.get('window');
 
@@ -31,6 +32,10 @@ const COLORS = {
       start: '#3949AB',
       end: '#1A237E',
     },
+  },
+  map: {
+    background: '#000000',
+    marker: '#FFFF99',
   },
 };
 
@@ -170,6 +175,51 @@ const Dashboard: React.FC = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.scrollingMetricsList}
           />
+        </View>
+
+        {/* Map Section */}
+        <View style={styles.mapContainer}>
+          <Text style={styles.mapTitle}>Farm Location</Text>
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: 37.78825,
+              longitude: -122.4324,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+            customMapStyle={[
+              {
+                elementType: "geometry",
+                stylers: [
+                  {
+                    color: COLORS.map.background,
+                  },
+                ],
+              },
+              {
+                elementType: "labels.text.stroke",
+                stylers: [
+                  {
+                    color: COLORS.map.background,
+                  },
+                ],
+              },
+              {
+                elementType: "labels.text.fill",
+                stylers: [
+                  {
+                    color: COLORS.map.marker,
+                  },
+                ],
+              },
+            ]}
+          >
+            <Marker
+              coordinate={{ latitude: 37.78825, longitude: -122.4324 }}
+              pinColor={COLORS.map.marker}
+            />
+          </MapView>
         </View>
 
         <View style={styles.newsContainer}>
@@ -455,6 +505,22 @@ const styles = StyleSheet.create({
   scrollingMetricUnit: {
     fontSize: 14,
   },
+  mapContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  mapTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text.primary,
+    marginBottom: 10,
+  },
+  map: {
+    height: 200,
+    borderRadius: 10,
+  },
   newsContainer: {
     marginTop: 20,
     marginBottom: 300,
@@ -570,12 +636,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  Billy:{
+  Billy: {
     fontSize: 18,
     color: 'white',
     marginBottom: 2,
     lineHeight: 24,
-    marginRight:100,
+    marginRight: 100,
   }
 });
 
