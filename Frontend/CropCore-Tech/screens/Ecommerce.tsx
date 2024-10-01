@@ -1,175 +1,233 @@
-import React from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useMemo } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+  SafeAreaView,
+  StatusBar,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const Banner = () => (
-  <View style={styles.banner}>
-    <Image source={{ uri: 'https://example.com/pear-image.jpg' }} style={styles.bannerImage} />
-    <Text style={styles.bannerTitle}>Banner title</Text>
-    <View style={styles.dots}>
-      {[...Array(4)].map((_, i) => (
-        <View key={i} style={[styles.dot, i === 0 && styles.activeDot]} />
-      ))}
+// Types
+type Product = {
+  id: string;
+  name: string;
+  price: string;
+  imageUrl: string;
+  category: string;
+};
+
+type Category = {
+  id: string;
+  name: string;
+};
+
+// Constants
+const COLORS = {
+  primary: '#1E88E5',
+  secondary: '#3949AB',
+  accent: '#00ACC1',
+  background: {
+    start: '#1A237E',
+    end: '#121212',
+  },
+  card: {
+    start: '#1E88E5',
+    end: '#0D47A1',
+  },
+  text: {
+    primary: '#FFFFFF',
+    secondary: '#B0BEC5',
+  },
+};
+
+const CATEGORIES: Category[] = [
+  { id: 'all', name: 'All' },
+  { id: 'vegetables', name: 'Vegetables' },
+  { id: 'fruits', name: 'Fruits' },
+  { id: 'seeds', name: 'Seeds' },
+  { id: 'supplies', name: 'Supplies' },
+];
+
+// Generate 50 static products
+const PRODUCTS: Product[] = Array.from({ length: 50 }, (_, index) => ({
+  id: `product-${index + 1}`,
+  name: `Product ${index + 1}`,
+  price: `$${(Math.random() * 20 + 1).toFixed(2)}`,
+  imageUrl: '/api/placeholder/100/100',
+  category: CATEGORIES[Math.floor(Math.random() * (CATEGORIES.length - 1)) + 1].id,
+}));
+
+// Components
+const Header: React.FC = () => (
+  <View style={styles.header}>
+    <Text style={styles.logo}>AgriMarket</Text>
+    <View style={styles.iconContainer}>
+      <TouchableOpacity>
+        <Text style={styles.icon}>❤️</Text>
+      </TouchableOpacity>
+      <TouchableOpacity>
+        <Text style={styles.icon}>🛒</Text>
+      </TouchableOpacity>
     </View>
   </View>
 );
 
-const CategoryItem = ({ title, imageUri }: { title: string; imageUri: string }) => (
-  <View style={styles.categoryItem}>
-    <Image source={{ uri: imageUri }} style={styles.categoryImage} />
-    <Text style={styles.categoryTitle}>{title}</Text>
+const CategoryFilter: React.FC<{
+  categories: Category[];
+  selectedCategory: string;
+  onSelectCategory: (category: string) => void;
+}> = ({ categories, selectedCategory, onSelectCategory }) => (
+  <View style={styles.categoryContainer}>
+    {categories.map((category) => (
+      <TouchableOpacity
+        key={category.id}
+        style={[
+          styles.categoryButton,
+          selectedCategory === category.id && styles.selectedCategoryButton,
+        ]}
+        onPress={() => onSelectCategory(category.id)}
+      >
+        <Text
+          style={[
+            styles.categoryButtonText,
+            selectedCategory === category.id && styles.selectedCategoryButtonText,
+          ]}
+        >
+          {category.name}
+        </Text>
+      </TouchableOpacity>
+    ))}
   </View>
 );
 
-const ProductItem = ({ name, price, imageUri }: { name: string; price: string; imageUri: string }) => (
-  <View style={styles.productItem}>
-    <Image source={{ uri: imageUri }} style={styles.productImage} />
-    <Text style={styles.productBrand}>Brand</Text>
-    <Text style={styles.productName}>{name}</Text>
-    <Text style={styles.productPrice}>{price}</Text>
+const ProductCard: React.FC<{ product: Product }> = ({ product }) => (
+  <View style={styles.productCard}>
+    <LinearGradient
+      colors={[COLORS.card.start, COLORS.card.end]}
+      style={styles.cardGradient}
+    >
+      <Image source={{ uri: product.imageUrl }} style={styles.productImage} />
+      <Text style={styles.productName}>{product.name}</Text>
+      <Text style={styles.productPrice}>{product.price}</Text>
+    </LinearGradient>
   </View>
 );
 
-const Ecomm = () => {
+const AgricultureEcommerceScreen: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  const filteredProducts = useMemo(() => {
+    return selectedCategory === 'all'
+      ? PRODUCTS
+      : PRODUCTS.filter((product) => product.category === selectedCategory);
+  }, [selectedCategory]);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="auto" />
-      <ScrollView>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={24} color="gray" />
-          <Text style={styles.searchText}>Search</Text>
-        </View>
-        <Banner />
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Title</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <CategoryItem title="Title" imageUri="https://example.com/pears.jpg" />
-            <CategoryItem title="Title" imageUri="https://example.com/watermelon.jpg" />
-            <CategoryItem title="Title" imageUri="https://example.com/vegetables.jpg" />
-            <CategoryItem title="Title" imageUri="https://example.com/fruit.jpg" />
-          </ScrollView>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Title</Text>
-          <View style={styles.productGrid}>
-            <ProductItem name="Product name" price="Rs.1000" imageUri="https://example.com/radishes.jpg" />
-            <ProductItem name="Product name" price="Rs.750" imageUri="https://example.com/mushrooms.jpg" />
-            <ProductItem name="Product name" price="Rs.400" imageUri="https://example.com/carrots.jpg" />
-          </View>
-        </View>
-      </ScrollView>
-
-      
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" />
+      <LinearGradient
+        colors={[COLORS.background.start, COLORS.background.end]}
+        style={styles.container}
+      >
+        <Header />
+        <CategoryFilter
+          categories={CATEGORIES}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+        <FlatList
+          data={filteredProducts}
+          renderItem={({ item }) => <ProductCard product={item} />}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          contentContainerStyle={styles.productList}
+        />
+      </LinearGradient>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background.start,
+  },
   container: {
     flex: 1,
-    marginTop:40,
-    backgroundColor: '#fff',
   },
-  searchBar: {
+  header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    margin: 10,
+    padding: 16,
   },
-  searchText: {
-    marginLeft: 10,
-    color: 'gray',
-  },
-  quickLinks: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 10,
-  },
-  banner: {
-    height: 200,
-    justifyContent: 'flex-end',
-    padding: 20,
-  },
-  bannerImage: {
-    ...StyleSheet.absoluteFillObject,
-    resizeMode: 'cover',
-  },
-  bannerTitle: {
-    color: 'white',
+  logo: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: COLORS.text.primary,
   },
-  dots: {
+  iconContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 10,
   },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    marginHorizontal: 4,
+  icon: {
+    fontSize: 24,
+    marginLeft: 16,
   },
-  activeDot: {
-    backgroundColor: 'white',
-  },
-  section: {
-    margin: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  categoryItem: {
-    marginRight: 10,
-    alignItems: 'center',
-  },
-  categoryImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  categoryTitle: {
-    marginTop: 5,
-  },
-  productGrid: {
+  categoryContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
-  productItem: {
-    width: '48%',
-    marginBottom: 10,
+  categoryButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: COLORS.secondary,
+  },
+  selectedCategoryButton: {
+    backgroundColor: COLORS.accent,
+  },
+  categoryButtonText: {
+    color: COLORS.text.primary,
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  selectedCategoryButtonText: {
+    color: COLORS.text.primary,
+  },
+  productList: {
+    padding: 8,
+  },
+  productCard: {
+    flex: 1,
+    margin: 8,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  cardGradient: {
+    padding: 12,
   },
   productImage: {
     width: '100%',
-    height: 150,
-    borderRadius: 8,
-  },
-  productBrand: {
-    color: 'gray',
-    fontSize: 12,
+    height: 120,
+    borderRadius: 4,
+    marginBottom: 8,
   },
   productName: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.text.primary,
+    marginBottom: 4,
   },
   productPrice: {
-    fontWeight: 'bold',
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    fontSize: 14,
+    color: COLORS.text.secondary,
   },
 });
 
-export default Ecomm;
+export default AgricultureEcommerceScreen;
