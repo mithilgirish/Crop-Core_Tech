@@ -25,7 +25,7 @@ interface MotorData {
   waterFlow: number;
 }
 
-const API_BASE_URL = "http://192.168.0.102:8000/motor/esp32";
+const API_BASE_URL = "http://172.16.45.10:8000/motor/esp32";
 
 const COLORS = {
   primary: '#1E88E5',

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit';
+import axios from 'axios';
 
 const COLORS = {
   primary: '#1E88E5',
@@ -23,83 +24,57 @@ const COLORS = {
   },
   graph: {
     background: '#000000',
-    line: '#39FF14',  // Neon green
+    line: '#39FF14', // Neon green
   },
 };
 
 interface MarketItem {
-  id: string;
+  id: string; // You may want to create a unique id for each item
   name: string;
   wholesalePrice: number;
   retailPriceMin: number;
   retailPriceMax: number;
   units: string;
-  icon: string;
-  trend: number;
-  data: number[];
+  icon: string; // You need to set an appropriate icon or define a default
+  trend: number; // You may want to calculate or set a default trend value
+  data: number[]; // Assuming this is a placeholder for historical price data
 }
 
-const marketItems: MarketItem[] = [
-  {
-    id: '1',
-    name: 'Onion Big',
-    wholesalePrice: 45,
-    retailPriceMin: 52,
-    retailPriceMax: 57,
-    units: '1kg',
-    icon: 'food-apple',
-    trend: 1.2,
-    data: [40, 42, 43, 45, 44, 45],
-  },
-  {
-    id: '2',
-    name: 'Tomato',
-    wholesalePrice: 30,
-    retailPriceMin: 35,
-    retailPriceMax: 40,
-    units: '1kg',
-    icon: 'food-apple-outline',
-    trend: -0.8,
-    data: [32, 31, 30, 29, 30, 30],
-  },
-  {
-    id: '3',
-    name: 'Potato',
-    wholesalePrice: 20,
-    retailPriceMin: 25,
-    retailPriceMax: 28,
-    units: '1kg',
-    icon: 'grain',
-    trend: 0.5,
-    data: [18, 19, 20, 21, 20, 20],
-  },
-  {
-    id: '4',
-    name: 'Carrot',
-    wholesalePrice: 25,
-    retailPriceMin: 30,
-    retailPriceMax: 35,
-    units: '1kg',
-    icon: 'carrot',
-    trend: 0.3,
-    data: [24, 25, 26, 25, 25, 25],
-  },
-  {
-    id: '5',
-    name: 'Cucumber',
-    wholesalePrice: 15,
-    retailPriceMin: 18,
-    retailPriceMax: 22,
-    units: '1kg',
-    icon: 'food',
-    trend: -0.2,
-    data: [16, 15, 15, 14, 15, 15],
-  },
-];
-
 const MarketTrendAnalysis: React.FC = () => {
-  const [selectedItem, setSelectedItem] = useState(marketItems[0]);
+  const [marketItems, setMarketItems] = useState<MarketItem[]>([]);
+  const [selectedItem, setSelectedItem] = useState<MarketItem | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMarketData = async () => {
+      try {
+        const response = await axios.get('http://172.16.45.10:8000/api/market-prices/');
+
+        // Map the API response to the MarketItem format
+        const items: MarketItem[] = response.data.map((item: any, index: number) => ({
+          id: `${index}`, // Generate a unique id
+          name: item['CROP NAME'],
+          wholesalePrice: parseFloat(item['WHOLESALE PRICE'].replace('₹', '').trim()), // Convert to number
+          retailPriceMin: parseFloat(item['RETAIL PRICE'].split('-')[0].replace('₹', '').trim()), // Get min retail price
+          retailPriceMax: parseFloat(item['RETAIL PRICE'].split('-')[1].replace('₹', '').trim()), // Get max retail price
+          units: item['UNITS'],
+          icon: 'food' as string, // Use a default icon or assign based on item
+          trend: 0, // Default value, implement logic if needed
+          data: [], // Placeholder for historical data
+        }));
+
+        setMarketItems(items);
+        setSelectedItem(items[0]); // Set the first item as selected by default
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching market data:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchMarketData();
+  }, []);
 
   const renderTrendIcon = (trend: number) => {
     if (trend > 0) return 'trending-up';
@@ -120,10 +95,10 @@ const MarketTrendAnalysis: React.FC = () => {
           <Text style={styles.trendCardTitle}>{item.name}</Text>
         </View>
         <View style={styles.trendInfo}>
-          <MaterialCommunityIcons 
-            name={renderTrendIcon(item.trend)} 
-            size={24} 
-            color={item.trend >= 0 ? COLORS.accent : '#F44336'} 
+          <MaterialCommunityIcons
+            name={renderTrendIcon(item.trend)}
+            size={24}
+            color={item.trend >= 0 ? COLORS.accent : '#F44336'}
           />
           <Text style={[styles.trendText, { color: item.trend >= 0 ? COLORS.accent : '#F44336' }]}>
             {Math.abs(item.trend).toFixed(2)}%
@@ -155,6 +130,14 @@ const MarketTrendAnalysis: React.FC = () => {
     </TouchableOpacity>
   );
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <ActivityIndicator size="large" color={COLORS.accent} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <LinearGradient
@@ -163,20 +146,20 @@ const MarketTrendAnalysis: React.FC = () => {
       >
         <ScrollView showsVerticalScrollIndicator={false}>
           <Text style={styles.header}>Market Trend Analysis</Text>
-          
+
           <TouchableOpacity onPress={() => setIsDropdownOpen(!isDropdownOpen)}>
             <View style={styles.dropdown}>
-              <MaterialCommunityIcons name={selectedItem.icon as any} size={24} color={COLORS.accent} />
-              <Text style={styles.dropdownText}>{selectedItem.name}</Text>
-              <MaterialCommunityIcons name={isDropdownOpen ? "chevron-up" : "chevron-down"} size={24} color={COLORS.accent} />
+              <MaterialCommunityIcons name={selectedItem?.icon as any} size={24} color={COLORS.accent} />
+              <Text style={styles.dropdownText}>{selectedItem?.name}</Text>
+              <MaterialCommunityIcons name={isDropdownOpen ? 'chevron-up' : 'chevron-down'} size={24} color={COLORS.accent} />
             </View>
           </TouchableOpacity>
 
           {isDropdownOpen && (
             <View style={styles.dropdownList}>
               {marketItems.map((item) => (
-                <TouchableOpacity 
-                  key={item.id} 
+                <TouchableOpacity
+                  key={item.id}
                   style={styles.dropdownItem}
                   onPress={() => {
                     setSelectedItem(item);
@@ -190,75 +173,58 @@ const MarketTrendAnalysis: React.FC = () => {
             </View>
           )}
 
-          <View style={styles.card}>
-            <Text style={styles.itemName}>{selectedItem.name}</Text>
-            <Text style={styles.price}>₹ {selectedItem.wholesalePrice}/{selectedItem.units}</Text>
-            <Text style={styles.priceLabel}>Wholesale Price</Text>
-            <Text style={styles.updateInfo}>Last Updated: Today</Text>
-          </View>
+          {selectedItem && (
+            <>
+              <View style={styles.card}>
+                <Text style={styles.itemName}>{selectedItem.name}</Text>
+                <Text style={styles.price}>₹ {selectedItem.wholesalePrice}/{selectedItem.units}</Text>
+                <Text style={styles.priceLabel}>Wholesale Price</Text>
+                <Text style={styles.updateInfo}>Last Updated: Today</Text>
+              </View>
 
-          <View style={styles.row}>
-            <View style={[styles.infoCard, styles.halfWidth]}>
-              <MaterialCommunityIcons name="truck-delivery" size={24} color={COLORS.accent} />
-              <Text style={styles.infoLabel}>Wholesale</Text>
-              <Text style={styles.infoValue}>₹ {selectedItem.wholesalePrice}</Text>
-            </View>
-            <View style={[styles.infoCard, styles.halfWidth]}>
-              <MaterialCommunityIcons name="store" size={24} color={COLORS.accent} />
-              <Text style={styles.infoLabel}>Retail</Text>
-              <Text style={styles.infoValue}>₹ {selectedItem.retailPriceMin} - {selectedItem.retailPriceMax}</Text>
-            </View>
-          </View>
+              <View style={styles.row}>
+                <View style={[styles.infoCard, styles.halfWidth]}>
+                  <MaterialCommunityIcons name="truck-delivery" size={24} color={COLORS.accent} />
+                  <Text style={styles.infoLabel}>Wholesale</Text>
+                  <Text style={styles.infoValue}>₹ {selectedItem.wholesalePrice}</Text>
+                </View>
+                <View style={[styles.infoCard, styles.halfWidth]}>
+                  <MaterialCommunityIcons name="store" size={24} color={COLORS.accent} />
+                  <Text style={styles.infoLabel}>Retail</Text>
+                  <Text style={styles.infoValue}>₹ {selectedItem.retailPriceMin} - {selectedItem.retailPriceMax}</Text>
+                </View>
+              </View>
 
-          <View style={[styles.infoCard, styles.fullWidth]}>
-            <MaterialCommunityIcons name="scale-balance" size={24} color={COLORS.accent} />
-            <Text style={styles.infoLabel}>Units</Text>
-            <Text style={styles.infoValue}>{selectedItem.units}</Text>
-          </View>
+              <View style={[styles.infoCard, styles.fullWidth]}>
+                <MaterialCommunityIcons name="scale-balance" size={24} color={COLORS.accent} />
+                <Text style={styles.infoLabel}>Units</Text>
+                <Text style={styles.infoValue}>{selectedItem.units}</Text>
+              </View>
 
-          <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Price Trend (Wholesale vs Retail)</Text>
-            <LineChart
-              data={{
-                labels: ['Wholesale', 'Retail'],
-                datasets: [{
-                  data: [selectedItem.wholesalePrice, (selectedItem.retailPriceMin + selectedItem.retailPriceMax) / 2]
-                }]
-              }}
-              width={Dimensions.get('window').width - 60}
-              height={220}
-              chartConfig={{
-                backgroundColor: COLORS.graph.background,
-                backgroundGradientFrom: COLORS.graph.background,
-                backgroundGradientTo: COLORS.graph.background,
-                color: (opacity = 1) => COLORS.graph.line,
-                labelColor: (opacity = 1) => COLORS.text.primary,
-                style: {
-                  borderRadius: 16
-                },
-                propsForDots: {
-                  r: "6",
-                  strokeWidth: "2",
-                  stroke: COLORS.graph.line
-                },
-                strokeWidth: 2,
-              }}
-              bezier
-              style={styles.chart}
-            />
-          </View>
-
-          <Text style={styles.sectionTitle}>Other Market Trends</Text>
-          <FlatList
-            data={marketItems}
-            renderItem={renderMarketTrendCard}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.trendList}
-          />
-
-          <View style={styles.spacer} />
+              <View style={styles.chartCard}>
+                <Text style={styles.chartTitle}>Price Trend (Wholesale vs Retail)</Text>
+                <LineChart
+                  data={{
+                    labels: ['Wholesale', 'Retail'],
+                    datasets: [{
+                      data: [selectedItem.wholesalePrice, (selectedItem.retailPriceMin + selectedItem.retailPriceMax) / 2],
+                    }],
+                  }}
+                  width={Dimensions.get('window').width - 60}
+                  height={220}
+                  chartConfig={{
+                    backgroundColor: COLORS.graph.background,
+                    backgroundGradientFrom: COLORS.graph.background,
+                    backgroundGradientTo: COLORS.graph.background,
+                    color: (opacity = 1) => COLORS.graph.line,
+                    strokeWidth: 2,
+                  }}
+                  bezier
+                  style={styles.chart}
+                />
+              </View>
+            </>
+          )}
         </ScrollView>
       </LinearGradient>
     </SafeAreaView>
@@ -268,55 +234,74 @@ const MarketTrendAnalysis: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background.start,
   },
   container: {
     flex: 1,
-    padding: 20,
+    padding: 16,
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     color: COLORS.text.primary,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   dropdown: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: COLORS.card.start,
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    justifyContent: 'space-between',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    marginBottom: 16,
   },
   dropdownText: {
     color: COLORS.text.primary,
-    fontSize: 18,
-    flex: 1,
-    marginLeft: 10,
+    marginLeft: 8,
   },
   dropdownList: {
-    backgroundColor: COLORS.card.start,
-    borderRadius: 10,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   dropdownItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.card.end,
+    padding: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   dropdownItemText: {
     color: COLORS.text.primary,
-    fontSize: 16,
-    marginLeft: 10,
+    marginLeft: 8,
+  },
+  trendCard: {
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+  },
+  trendCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  trendCardTitle: {
+    color: COLORS.text.primary,
+    marginLeft: 8,
+    fontWeight: 'bold',
+  },
+  trendInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  trendText: {
+    marginLeft: 4,
+    fontWeight: 'bold',
+  },
+  miniChart: {
+    marginTop: 8,
   },
   card: {
-    backgroundColor: COLORS.card.start,
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: 8,
+    padding: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginBottom: 16,
   },
   itemName: {
     fontSize: 20,
@@ -324,107 +309,55 @@ const styles = StyleSheet.create({
     color: COLORS.text.primary,
   },
   price: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.accent,
-    marginVertical: 5,
+    fontSize: 18,
+    color: COLORS.text.secondary,
   },
   priceLabel: {
-    fontSize: 16,
     color: COLORS.text.secondary,
   },
   updateInfo: {
-    fontSize: 14,
     color: COLORS.text.secondary,
-    marginTop: 5,
+    fontStyle: 'italic',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
   },
   infoCard: {
-    backgroundColor: COLORS.card.start,
-    borderRadius: 10,
-    padding: 15,
+    flexDirection: 'column',
     alignItems: 'center',
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginBottom: 16,
   },
   halfWidth: {
     width: '48%',
   },
   fullWidth: {
     width: '100%',
-    marginBottom: 20,
   },
   infoLabel: {
-    fontSize: 14,
     color: COLORS.text.secondary,
-    marginTop: 5,
   },
   infoValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
     color: COLORS.text.primary,
-    marginTop: 5,
+    fontWeight: 'bold',
   },
   chartCard: {
-    backgroundColor: COLORS.card.start,
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   chartTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: COLORS.text.primary,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   chart: {
     marginVertical: 8,
-    borderRadius: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.text.primary,
-    marginBottom: 10,
-  },
-  trendList: {
-    marginBottom: 20,
-  },
-  trendCard: {
-    width: 160,
-    borderRadius: 10,
-    padding: 15,
-    marginRight: 10,
-  },
-  trendCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  trendCardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: COLORS.text.primary,
-    marginLeft: 10,
-  },
-  trendInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  trendText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: 5,
-  },
-  miniChart: {
-    marginVertical: 8,
-    borderRadius: 16,
-  },
-  spacer: {
-    height: 100,
   },
 });
 

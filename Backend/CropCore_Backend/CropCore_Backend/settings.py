@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-6g%geg%04s#%86nm-su%v)#qim8$i36*znk!p3(t$pfrcdaf73
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.0.102', '127.0.0.1', 'localhost', '172.16.45.10']
+
 
 
 # Application definition
@@ -38,9 +39,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'motor',
+    'CropY',
+    'cropR',
+    'cropSF',
+    'News',
+    'marketTrend',
     'rest_framework',
     'corsheaders',
 ]
+
+APPEND_SLASH=False
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,7 +63,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'CropCore_Backend.urls'
 
-ALLOWED_HOSTS = ['192.168.0.102', '127.0.0.1','localhost']
 
 TEMPLATES = [
     {
