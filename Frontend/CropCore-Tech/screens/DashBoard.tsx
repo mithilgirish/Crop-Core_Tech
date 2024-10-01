@@ -3,8 +3,32 @@ import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, FlatL
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
+
+// Define a professional color palette
+const COLORS = {
+  primary: '#1E88E5',       // A professional blue
+  secondary: '#3949AB',     // Slightly darker blue for depth
+  accent: '#00ACC1',        // Teal accent
+  background: {
+    start: '#1A237E',       // Dark blue
+    end: '#121212',         // Near black
+  },
+  card: {
+    start: '#1E88E5',       // Primary blue
+    end: '#0D47A1',         // Darker blue
+  },
+  text: {
+    primary: '#FFFFFF',
+    secondary: '#B0BEC5',
+  },
+  menu: {
+    background: '#121212',
+    itemBorder: '#1F1F1F',
+  },
+};
 
 interface MetricCardProps {
   title: string;
@@ -16,19 +40,20 @@ interface MetricCardProps {
 
 type DashboardScreenNavigationProp = NavigationProp<ParamListBase>;
 
-const MetricCard: React.FC<MetricCardProps> = ({ title, value, unit, icon, color }) => (
-  <View style={[styles.metricCard, { backgroundColor: color }]}>
-    <Feather name={icon} size={24} color="#333" />
+const MetricCard: React.FC<MetricCardProps> = ({ title, value, unit, icon }) => (
+  <LinearGradient colors={[COLORS.card.start, COLORS.card.end]} style={styles.metricCard}>
+    <Feather name={icon} size={24} color={COLORS.text.primary} />
     <Text style={styles.metricTitle}>{title}</Text>
     <Text style={styles.metricValue}>
-      {value}<Text style={styles.metricUnit}>{unit}</Text>
+      {value}
+      <Text style={styles.metricUnit}>{unit}</Text>
     </Text>
-  </View>
+  </LinearGradient>
 );
 
 const MenuItem: React.FC<{ title: string; icon: keyof typeof Feather.glyphMap; onPress: () => void }> = ({ title, icon, onPress }) => (
   <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-    <Feather name={icon} size={24} color="#333" />
+    <Feather name={icon} size={24} color={COLORS.text.primary} />
     <Text style={styles.menuItemText}>{title}</Text>
   </TouchableOpacity>
 );
@@ -47,61 +72,65 @@ const Dashboard: React.FC = () => {
   };
 
   const scrollingMetrics: (MetricCardProps & { id: string })[] = [
-    { id: '1', title: "Nitrogen", value: 180, unit: "ppm", icon: "droplet", color: '#FFDF00' },
-    { id: '2', title: "Phosphorus", value: 150, unit: "ppm", icon: "droplet", color: '#FFDF00' },
-    { id: '3', title: "Potassium", value: 180, unit: "ppm", icon: "droplet", color: '#FFDF00' },
-    { id: '4', title: "pH", value: 6.5, unit: "", icon: "activity", color: '#FFDF00' },
-    { id: '5', title: "Soil Moisture", value: 40, unit: "%", icon: "droplet", color: '#FFDF00' },
+    { id: '1', title: "Nitrogen", value: 180, unit: "ppm", icon: "droplet", color: COLORS.card.start },
+    { id: '2', title: "Phosphorus", value: 150, unit: "ppm", icon: "droplet", color: COLORS.card.start },
+    { id: '3', title: "Potassium", value: 180, unit: "ppm", icon: "droplet", color: COLORS.card.start },
+    { id: '4', title: "pH", value: 6.5, unit: "", icon: "activity", color: COLORS.card.start },
+    { id: '5', title: "Soil Moisture", value: 40, unit: "%", icon: "droplet", color: COLORS.card.start },
   ];
 
   const renderScrollingMetric = ({ item }: { item: MetricCardProps & { id: string } }) => (
-    <View style={[styles.scrollingMetricItem, { backgroundColor: item.color }]}>
-      <Feather name={item.icon} size={24} color="#333" />
+    <LinearGradient colors={[COLORS.card.start, COLORS.card.end]} style={styles.scrollingMetricItem}>
+      <Feather name={item.icon} size={24} color={COLORS.text.primary} />
       <Text style={styles.scrollingMetricTitle}>{item.title}</Text>
       <Text style={styles.scrollingMetricValue}>
-        {item.value}<Text style={styles.scrollingMetricUnit}>{item.unit}</Text>
+        {item.value}
+        <Text style={styles.scrollingMetricUnit}>{item.unit}</Text>
       </Text>
-    </View>
+    </LinearGradient>
   );
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={[COLORS.background.start, COLORS.background.end]} style={styles.backgroundGradient}>
       {!menuVisible && (
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={toggleMenu} style={styles.iconButton}>
-            <Feather name="menu" size={24} color="#FFFFFF" />
+            <Feather name="menu" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Farm Dashboard</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Community' as never)} style={styles.iconButton}>
-            <Feather name="users" size={24} color="#FFFFFF" />
+            <Feather name="users" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
         </View>
       )}
+
       {menuVisible && (
         <View style={styles.menuContainer}>
           <View style={styles.userInfo}>
             <Image source={{ uri: 'https://example.com/avatar.jpg' }} style={styles.userAvatar} />
             <Text style={styles.userName}>Venkatakrishnan</Text>
             <TouchableOpacity onPress={toggleMenu} style={styles.closeButton}>
-              <Feather name="x" size={24} color="#FFFFFF" />
+              <Feather name="x" size={24} color={COLORS.text.primary} />
             </TouchableOpacity>
           </View>
           <MenuItem title="Profile" icon="user" onPress={() => navigation.navigate('Profile' as never)} />
           <MenuItem title="Share the App" icon="share-2" onPress={() => {}} />
           <MenuItem title="Talk to Experts" icon="headphones" onPress={() => {}} />
           <MenuItem title="Select Language" icon="globe" onPress={() => {}} />
-	  <MenuItem title="Terms of Use" icon="file-text" onPress={() => {}} />
+          <MenuItem title="Terms of Use" icon="file-text" onPress={() => {}} />
           <MenuItem title="Premium" icon="star" onPress={() => {}} />
           <MenuItem title="About Us" icon="info" onPress={() => {}} />
         </View>
       )}
+
       <ScrollView style={styles.scrollContent}>
         <Text style={styles.greeting}>Hello User,</Text>
         <View style={styles.metricsContainer}>
-          <MetricCard title="Temperature" value={25} unit="°C" icon="thermometer" color="#FFB74D" />
-          <MetricCard title="Humidity" value={60} unit="%" icon="droplet" color="#4FC3F7" />
-          <MetricCard title="Light" value={800} unit="lux" icon="sun" color="#FFF176" />
+          <MetricCard title="Temperature" value={25} unit="°C" icon="thermometer" color={COLORS.card.start} />
+          <MetricCard title="Humidity" value={60} unit="%" icon="droplet" color={COLORS.card.start} />
+          <MetricCard title="Light" value={800} unit="lux" icon="sun" color={COLORS.card.start} />
         </View>
+
         <View style={styles.scrollingMetricsContainer}>
           <FlatList
             data={scrollingMetrics}
@@ -112,14 +141,15 @@ const Dashboard: React.FC = () => {
             contentContainerStyle={styles.scrollingMetricsList}
           />
         </View>
+
         <View style={styles.newsContainer}>
           <View style={styles.newsHeader}>
-            <MaterialCommunityIcons name="newspaper-variant-outline" size={24} color="#333" style={styles.newsIcon} />
-            <Text>Agriculture News</Text>
+            <MaterialCommunityIcons name="newspaper-variant-outline" size={24} color={COLORS.text.primary} style={styles.newsIcon} />
+            <Text style={styles.newsHeaderText}>Agriculture News</Text>
           </View>
-          {[1, 2, 3, 4].map((item) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
             <View key={item} style={styles.newsItem}>
-              <MaterialCommunityIcons name="leaf" size={20} color="#4CAF50" style={styles.newsItemIcon} />
+              <MaterialCommunityIcons name="leaf" size={20} color={COLORS.accent} style={styles.newsItemIcon} />
               <View>
                 <Text style={styles.newsTitle}>News {item}</Text>
                 <Text style={styles.newsContent}>
@@ -131,31 +161,29 @@ const Dashboard: React.FC = () => {
           ))}
         </View>
       </ScrollView>
+
       <TouchableOpacity style={styles.chatbotButton} onPress={toggleChatbot}>
-        <Feather name="message-circle" size={30} color="#FFFFFF" />
+        <Feather name="message-circle" size={30} color={COLORS.text.primary} />
       </TouchableOpacity>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  backgroundGradient: {
     flex: 1,
-    padding:0,
-    marginTop:0,
-    backgroundColor: '#E8F5E9',
   },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 15,
-    backgroundColor: '#00A86B',
+    backgroundColor: 'transparent',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: COLORS.text.primary,
   },
   iconButton: {
     padding: 5,
@@ -166,7 +194,7 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     width: '80%',
-    backgroundColor: 'white',
+    backgroundColor: COLORS.menu.background,
     zIndex: 1000,
     elevation: 5,
   },
@@ -175,8 +203,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-    backgroundColor: '#00A86B',
+    borderBottomColor: COLORS.menu.itemBorder,
+    backgroundColor: COLORS.primary,
   },
   userAvatar: {
     width: 50,
@@ -187,7 +215,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: COLORS.text.primary,
     flex: 1,
   },
   closeButton: {
@@ -198,133 +226,120 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: COLORS.menu.itemBorder,
   },
   menuItemText: {
     fontSize: 16,
+    color: COLORS.text.primary,
     marginLeft: 15,
-    flex: 1,
   },
   scrollContent: {
-    padding: 15,
-    paddingBottom: 100,
+    paddingHorizontal: 15,
   },
   greeting: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: COLORS.text.primary,
+    marginVertical: 15,
   },
   metricsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
   },
   metricCard: {
+    flex: 1,
     borderRadius: 10,
     padding: 15,
+    margin: 5,
     alignItems: 'center',
-    width: (width - 60) / 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
+    justifyContent: 'center',
   },
   metricTitle: {
-    fontSize: 14,
-    color: '#333',
-    marginTop: 5,
+    fontSize: 16,
+    color: COLORS.text.primary,
+    marginVertical: 5,
   },
   metricValue: {
-    fontSize: 18,
+    fontSize: 24,
+    color: COLORS.text.primary,
     fontWeight: 'bold',
-    color: '#333',
   },
   metricUnit: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: 14,
   },
   scrollingMetricsContainer: {
-    marginBottom: 20,
-  },
-  scrollingMetricsList: {
-    paddingHorizontal: 5,
-  },
-  scrollingMetricItem: {
-    borderRadius: 10,
-    padding: 15,
-    alignItems: 'center',
-    marginRight: 10,
-    width: 120,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
-  },
-  scrollingMetricTitle: {
-    fontSize: 14,
-    color: '#333',
-    marginTop: 5,
-    textAlign: 'center',
-  },
-  scrollingMetricValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  scrollingMetricUnit: {
-    fontSize: 12,
-    color: '#666',
-  },
-  chatbotButton: {
-    position: 'absolute',
-    bottom: 100,
-    right: 20,
-    backgroundColor: '#4CAF50',
-    borderRadius: 30,
-    width: 60,
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
-    zIndex: 1,
-  },
-  newsContainer: {
-    backgroundColor: '#E0F2F1',
-    borderRadius: 10,
-    padding: 15,
     marginTop: 20,
   },
-  newsHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
-    flexDirection: 'row',
+  scrollingMetricsList: {
+    paddingVertical: 10,
+  },
+  scrollingMetricItem: {
+    width: width * 0.35,
+    borderRadius: 10,
+    padding: 15,
+    marginHorizontal: 5,
     alignItems: 'center',
   },
+  scrollingMetricTitle: {
+    fontSize: 16,
+    color: COLORS.text.primary,
+    marginVertical: 5,
+  },
+  scrollingMetricValue: {
+    fontSize: 24,
+    color: COLORS.text.primary,
+    fontWeight: 'bold',
+  },
+  scrollingMetricUnit: {
+    fontSize: 14,
+  },
+  newsContainer: {
+    marginTop: 20,
+    marginBottom: 300,
+  },
+  newsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   newsIcon: {
-    marginRight: 5,
+    marginRight: 10,
+  },
+  newsHeaderText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text.primary,
   },
   newsItem: {
-    marginBottom: 15,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: COLORS.menu.background,
+    borderRadius: 10,
   },
   newsItemIcon: {
     marginRight: 10,
-    marginTop: 2,
   },
   newsTitle: {
     fontSize: 16,
+    color: COLORS.text.primary,
     fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#1E90FF',
   },
   newsContent: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.text.secondary,
+  },
+  chatbotButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: COLORS.accent,
+    padding: 15,
+    borderRadius: 50,
+    elevation: 5,
+    marginBottom: 85,
   },
 });
 
