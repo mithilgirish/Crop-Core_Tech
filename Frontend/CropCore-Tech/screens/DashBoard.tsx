@@ -452,6 +452,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 50,
     elevation: 5,
+    marginBottom:85,
   },
   modalContainer: {
     flex: 1,
