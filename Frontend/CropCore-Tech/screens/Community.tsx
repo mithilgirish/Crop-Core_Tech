@@ -1,176 +1,300 @@
-import React, { useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  TouchableOpacity, 
-  Image, 
-  StyleSheet 
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ScrollView,
+  ListRenderItem,
 } from 'react-native';
-import { 
-  Ionicons 
-} from '@expo/vector-icons';
-import * as SplashScreen from 'expo-splash-screen';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-// Mock data
-const posts = [
-  { id: '1', author: 'John Doe', content: 'Just harvested my corn field!', likes: 15, comments: 3 },
-  { id: '2', author: 'Jane Smith', content: 'Any tips for dealing with pests in organic farming?', likes: 8, comments: 12 },
-];
+// Define types
+interface Post {
+  id: string;
+  author: string;
+  title: string;
+  content: string;
+  upvotes: number;
+  comments: number;
+  timestamp: string;
+}
 
-const events = [
-  { id: '1', title: 'Annual Farmer\'s Market', date: '2024-10-15', location: 'Central Square' },
-  { id: '2', title: 'Sustainable Farming Workshop', date: '2024-11-02', location: 'Community Center' },
-];
+interface Comment {
+  id: string;
+  author: string;
+  content: string;
+  upvotes: number;
+}
+
+// Color constants
+const COLORS = {
+  primary: '#1E88E5',
+  secondary: '#3949AB',
+  accent: '#00ACC1',
+  background: {
+    start: '#1A237E',
+    end: '#121212',
+  },
+  card: {
+    start: '#1E88E5',
+    end: '#0D47A1',
+  },
+  text: {
+    primary: '#FFFFFF',
+    secondary: '#B0BEC5',
+  },
+};
+
+// Generate mock data
+const generateMockData = (count: number): Post[] => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: (i + 1).toString(),
+    author: `User${i + 1}`,
+    title: `Post Title ${i + 1}`,
+    content: `This is the content of post ${i + 1}. It's a static example of what a longer post might look like on the Reddit-like community page.`,
+    upvotes: Math.floor(Math.random() * 1000),
+    comments: Math.floor(Math.random() * 50),
+    timestamp: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString(),
+  }));
+};
+
+const posts: Post[] = generateMockData(60);
+
+const generateMockComments = (count: number): Comment[] => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: (i + 1).toString(),
+    author: `Commenter${i + 1}`,
+    content: `This is a sample comment ${i + 1}. It could be short or long, depending on what the user wrote.`,
+    upvotes: Math.floor(Math.random() * 100),
+  }));
+};
 
 // Components
-const PostCard = ({ item }: { item: typeof posts[0] }) => (
-  <View style={styles.postCard}>
-    <Text style={styles.postAuthor}>{item.author}</Text>
-    <Text style={styles.postContent}>{item.content}</Text>
-    <View style={styles.postActions}>
+const CommentComponent: React.FC<{ comment: Comment }> = ({ comment }) => (
+  <View style={styles.comment}>
+    <Text style={styles.commentAuthor}>{comment.author}</Text>
+    <Text style={styles.commentContent}>{comment.content}</Text>
+    <View style={styles.commentActions}>
       <TouchableOpacity style={styles.actionButton}>
-        <Ionicons name="heart-outline" size={24} color="#4CAF50" />
-        <Text style={styles.actionText}>{item.likes}</Text>
+        <Ionicons name="arrow-up-outline" size={16} color={COLORS.text.secondary} />
+        <Text style={styles.actionText}>{comment.upvotes}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.actionButton}>
-        <Ionicons name="chatbubble-outline" size={24} color="#4CAF50" />
-        <Text style={styles.actionText}>{item.comments}</Text>
+        <Ionicons name="arrow-down-outline" size={16} color={COLORS.text.secondary} />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.actionButton}>
+        <Ionicons name="chatbubble-outline" size={16} color={COLORS.text.secondary} />
+        <Text style={styles.actionText}>Reply</Text>
       </TouchableOpacity>
     </View>
   </View>
 );
 
+interface PostCardProps {
+  item: Post;
+  onPress: () => void;
+}
 
-// Screens
-const HomeScreen = () => (
-  <View style={styles.container}>
-    <FlatList
-      data={posts}
-      renderItem={({ item }) => <PostCard item={item} />}
-      keyExtractor={item => item.id}
-    />
-  </View>
+const PostCard: React.FC<PostCardProps> = ({ item, onPress }) => (
+  <TouchableOpacity onPress={onPress}>
+    <LinearGradient
+      colors={[COLORS.card.start, COLORS.card.end]}
+      style={styles.postCard}
+    >
+      <View style={styles.postHeader}>
+        <Image
+          source={{ uri: `https://i.pravatar.cc/40?u=${item.author}` }}
+          style={styles.authorAvatar}
+        />
+        <Text style={styles.postAuthor}>{item.author}</Text>
+        <Text style={styles.postTimestamp}>{new Date(item.timestamp).toLocaleString()}</Text>
+      </View>
+      <Text style={styles.postTitle}>{item.title}</Text>
+      <Text style={styles.postContent} numberOfLines={3}>{item.content}</Text>
+      <View style={styles.postActions}>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="arrow-up-outline" size={24} color={COLORS.text.primary} />
+          <Text style={styles.actionText}>{item.upvotes}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="arrow-down-outline" size={24} color={COLORS.text.primary} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="chatbubble-outline" size={24} color={COLORS.text.primary} />
+          <Text style={styles.actionText}>{item.comments}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="share-outline" size={24} color={COLORS.text.primary} />
+        </TouchableOpacity>
+      </View>
+    </LinearGradient>
+  </TouchableOpacity>
 );
 
+const CommunityScreen: React.FC = () => {
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
-const ProfileScreen = () => (
-  <View style={styles.container}>
-    <Image
-      source={{ uri: 'https://via.placeholder.com/150' }}
-      style={styles.profileImage}
-    />
-    <Text style={styles.profileName}>Farmer Brown</Text>
-    <Text style={styles.profileBio}>Organic farmer for 20 years. Love sharing knowledge and experiences!</Text>
-  </View>
-);
+  const renderPostDetails = () => {
+    if (!selectedPost) return null;
 
-// Create navigators
-const Stack = createStackNavigator();
+    const comments = generateMockComments(Math.floor(Math.random() * 20) + 5);
 
+    return (
+      <ScrollView style={styles.postDetails}>
+        <PostCard item={selectedPost} onPress={() => {}} />
+        <View style={styles.commentSection}>
+          <Text style={styles.commentSectionTitle}>Comments</Text>
+          {comments.map((comment) => (
+            <CommentComponent key={comment.id} comment={comment} />
+          ))}
+        </View>
+      </ScrollView>
+    );
+  };
 
-const Community = () => {
-  useEffect(() => {
-    async function prepare() {
-      await SplashScreen.preventAutoHideAsync();
-    }
-    prepare();
-  }, []);
+  const renderItem: ListRenderItem<Post> = ({ item }) => (
+    <PostCard item={item} onPress={() => setSelectedPost(item)} />
+  );
 
   return (
-      <Stack.Navigator>
-        <Stack.Screen
-          name="FarmerConnect"
-          component={HomeScreen}
-          options={{
-            headerStyle: {
-              backgroundColor: '#4CAF50',
-            },
-            headerTintColor: '#fff',
-          }}
-        />
-      </Stack.Navigator>
+    <LinearGradient
+      colors={[COLORS.background.start, COLORS.background.end]}
+      style={styles.container}
+    >
+      {selectedPost ? (
+        <>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => setSelectedPost(null)}
+          >
+            <Ionicons name="arrow-back" size={24} color={COLORS.text.primary} />
+            <Text style={styles.backButtonText}>Back to Feed</Text>
+          </TouchableOpacity>
+          {renderPostDetails()}
+        </>
+      ) : (
+        <>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Reddit-like Community</Text>
+          </View>
+          <FlatList
+            data={posts}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+          />
+        </>
+      )}
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+  },
+  header: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.secondary,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.text.primary,
   },
   postCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 15,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    margin: 8,
+    padding: 16,
+    borderRadius: 8,
+  },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  authorAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    marginRight: 8,
   },
   postAuthor: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 5,
+    color: COLORS.text.primary,
+    marginRight: 8,
+  },
+  postTimestamp: {
+    fontSize: 12,
+    color: COLORS.text.secondary,
+  },
+  postTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text.primary,
+    marginBottom: 8,
   },
   postContent: {
     fontSize: 14,
-    marginBottom: 10,
+    color: COLORS.text.primary,
+    marginBottom: 8,
   },
   postActions: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   actionText: {
-    marginLeft: 5,
-    color: '#4CAF50',
+    marginLeft: 4,
+    color: COLORS.text.primary,
   },
-  eventCard: {
-    padding: 15,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 10,
+  postDetails: {
+    flex: 1,
   },
-  eventTitle: {
+  commentSection: {
+    padding: 16,
+  },
+  commentSectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 5,
+    color: COLORS.text.primary,
+    marginBottom: 16,
   },
-  eventDate: {
+  comment: {
+    marginBottom: 16,
+  },
+  commentAuthor: {
     fontSize: 14,
-    color: '#FFFFFF',
-    marginBottom: 3,
-  },
-  eventLocation: {
-    fontSize: 14,
-    color: '#FFFFFF',
-  },
-  profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    marginBottom: 20,
-  },
-  profileName: {
-    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    color: COLORS.text.primary,
+    marginBottom: 4,
   },
-  profileBio: {
+  commentContent: {
+    fontSize: 14,
+    color: COLORS.text.primary,
+    marginBottom: 8,
+  },
+  commentActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  backButtonText: {
+    marginLeft: 8,
     fontSize: 16,
-    textAlign: 'center',
-    paddingHorizontal: 20,
+    color: COLORS.text.primary,
   },
 });
 
-export default Community; 
+export default CommunityScreen;
