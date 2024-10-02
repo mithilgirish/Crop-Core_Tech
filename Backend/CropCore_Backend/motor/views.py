@@ -1,3 +1,4 @@
+import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,6 +10,7 @@ Motor = {"Power": 0, "WaterFlow": 0}
 @api_view(['POST'])
 def receive_sensor_data(request):
     # Assuming the ESP32 sends a JSON body with temperature, humidity, and moisture
+    
     try:
         data = request.data
         temperatureC = data.get('temperatureC')
@@ -26,13 +28,15 @@ def receive_sensor_data(request):
 # API to send motor control to ESP32
 @api_view(['POST'])
 def control_motor(request):
-    # Example: {"command": "ON"} or {"command": "OFF"}
     try:
         command = request.data.get("command")
         if command not in ["ON", "OFF"]:
             return Response({"error": "Invalid command"}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Assuming you'll use this response in the ESP32
+        # Here you will send the command to ESP32
+        esp32_ip = 'http://172.16.44.164/motor'  # ESP32 IP address
+        requests.post(esp32_ip, json={"command": command})
+
         return Response({"motor_status": f"Motor turned {command}"}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

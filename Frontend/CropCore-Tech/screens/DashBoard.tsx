@@ -4,21 +4,22 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
+import MapView, { Marker } from 'react-native-maps';
 
 const { width, height } = Dimensions.get('window');
 
-// Define a professional color palette
+// Updated color palette
 const COLORS = {
-  primary: '#1E88E5',       // A professional blue
-  secondary: '#3949AB',     // Slightly darker blue for depth
-  accent: '#00ACC1',        // Teal accent
+  primary: '#1E88E5',
+  secondary: '#3949AB',
+  accent: '#00ACC1',
   background: {
-    start: '#1A237E',       // Dark blue
-    end: '#121212',         // Near black
+    start: '#1A237E',
+    end: '#121212',
   },
   card: {
-    start: '#1E88E5',       // Primary blue
-    end: '#0D47A1',         // Darker blue
+    start: '#1E88E5',
+    end: '#0D47A1',
   },
   text: {
     primary: '#FFFFFF',
@@ -27,6 +28,14 @@ const COLORS = {
   menu: {
     background: '#121212',
     itemBorder: '#1F1F1F',
+    header: {
+      start: '#3949AB',
+      end: '#1A237E',
+    },
+  },
+  map: {
+    background: '#000000',
+    marker: '#FFFF99',
   },
 };
 
@@ -99,7 +108,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleTalkToExperts = () => {
-    Linking.openURL('tel:+1234567890');
+    Linking.openURL('tel:+919940332309');
   };
 
   const handleSelectLanguage = () => {
@@ -134,13 +143,13 @@ const Dashboard: React.FC = () => {
 
       {menuVisible && (
         <View style={styles.menuContainer}>
-          <View style={styles.userInfo}>
-            <Image source={{ uri: 'https://example.com/avatar.jpg' }} style={styles.userAvatar} />
-            <Text style={styles.userName}>Venkatakrishnan</Text>
+          <LinearGradient colors={[COLORS.menu.header.start, COLORS.menu.header.end]} style={styles.userInfo}>
+            <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/en/b/b7/Billy_Butcher.jpg' }} style={styles.userAvatar} />
+            <Text style={styles.Billy}> Billy butcher</Text>
             <TouchableOpacity onPress={toggleMenu} style={styles.closeButton}>
               <Feather name="x" size={24} color={COLORS.text.primary} />
             </TouchableOpacity>
-          </View>
+          </LinearGradient>
           <MenuItem title="Profile" icon="user" onPress={handleProfile} />
           <MenuItem title="Talk to Experts" icon="headphones" onPress={handleTalkToExperts} />
           <MenuItem title="Select Language" icon="globe" onPress={handleSelectLanguage} />
@@ -151,13 +160,12 @@ const Dashboard: React.FC = () => {
       )}
 
       <ScrollView style={styles.scrollContent}>
-        <Text style={styles.greeting}>Hello User,</Text>
+        <Text style={styles.greeting}>Hello Billy,</Text>
         <View style={styles.metricsContainer}>
           <MetricCard title="Temperature" value={25} unit="°C" icon="thermometer" color={COLORS.card.start} />
           <MetricCard title="Humidity" value={60} unit="%" icon="droplet" color={COLORS.card.start} />
           <MetricCard title="Light" value={800} unit="lux" icon="sun" color={COLORS.card.start} />
         </View>
-
         <View style={styles.scrollingMetricsContainer}>
           <FlatList
             data={scrollingMetrics}
@@ -167,6 +175,51 @@ const Dashboard: React.FC = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.scrollingMetricsList}
           />
+        </View>
+
+        {/* Map Section */}
+        <View style={styles.mapContainer}>
+          <Text style={styles.mapTitle}>Farm Location</Text>
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: 37.78825,
+              longitude: -122.4324,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+            customMapStyle={[
+              {
+                elementType: "geometry",
+                stylers: [
+                  {
+                    color: COLORS.map.background,
+                  },
+                ],
+              },
+              {
+                elementType: "labels.text.stroke",
+                stylers: [
+                  {
+                    color: COLORS.map.background,
+                  },
+                ],
+              },
+              {
+                elementType: "labels.text.fill",
+                stylers: [
+                  {
+                    color: COLORS.map.marker,
+                  },
+                ],
+              },
+            ]}
+          >
+            <Marker
+              coordinate={{ latitude: 37.78825, longitude: -122.4324 }}
+              pinColor={COLORS.map.marker}
+            />
+          </MapView>
         </View>
 
         <View style={styles.newsContainer}>
@@ -203,9 +256,9 @@ const Dashboard: React.FC = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>User Profile</Text>
-            <Image source={{ uri: 'https://example.com/avatar.jpg' }} style={styles.modalAvatar} />
-            <Text style={styles.modalText}>Name: Venkatakrishnan</Text>
-            <Text style={styles.modalText}>Email: venkat@example.com</Text>
+            <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/en/b/b7/Billy_Butcher.jpg' }} style={styles.modalAvatar} />
+            <Text style={styles.modalText}>Name: Billy Butcher</Text>
+            <Text style={styles.modalText}>Email: billy@gmail.com</Text>
             <Text style={styles.modalText}>Farm Size: 50 acres</Text>
             <TouchableOpacity style={styles.modalButton} onPress={() => setProfileModalVisible(false)}>
               <Text style={styles.modalButtonText}>Close</Text>
@@ -222,19 +275,22 @@ const Dashboard: React.FC = () => {
         onRequestClose={() => setTermsModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <ScrollView style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Terms of Use</Text>
-            <Text style={styles.modalText}>
-              By accessing CropCore-Tech mobile application (henceforth 'the Application' or 'App' or 'CropCore-Tech' interchangeably), which is owned, operated and managed by Team Cache Me (hereinafter referred to as "The Company", "we" or "us"), it is understood that you have read, understood and agree to be bound by the terms of the following user agreement and disclaimers. Please bring to our attention any content on the Application you believe to be inaccurate, inappropriate or in violation of these terms. Please write to us at cachemecacheme@gmail.com.
-
-              Acceptance of Terms of Use
-
-              If you do not agree to these terms, please do not install this Mobile Application. Please note that we may change the Terms of Use from time to time. Please review these terms periodically and if you do not agree to any changes made in the terms of use, please stop using the Application immediately. If you continue to use, it means that you accept the extant terms of use. In case of a discrepancy between the English version of these terms and any other language version, the English version will be considered as correct.
-            </Text>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setTermsModalVisible(false)}>
-              <Text style={styles.modalButtonText}>Close</Text>
-            </TouchableOpacity>
-          </ScrollView>
+          <LinearGradient colors={[COLORS.background.start, COLORS.background.end]} style={styles.modalContent}>
+            <ScrollView>
+              <Text style={styles.modalTitle}>Terms of Use</Text>
+              <MaterialCommunityIcons name="file-document-outline" size={50} color={COLORS.accent} style={styles.modalIcon} />
+              <Text style={styles.modalText}>
+                By accessing CropCore-Tech mobile application (henceforth 'the Application' or 'App' or 'CropCore-Tech' interchangeably), which is owned, operated and managed by Team Cache Me (hereinafter referred to as "The Company", "we" or "us"), it is understood that you have read, understood and agree to be bound by the terms of the following user agreement and disclaimers.
+              </Text>
+              <Text style={styles.modalSubtitle}>Acceptance of Terms of Use</Text>
+              <Text style={styles.modalText}>
+                If you do not agree to these terms, please do not install this Mobile Application. Please note that we may change the Terms of Use from time to time. Please review these terms periodically and if you do not agree to any changes made in the terms of use, please stop using the Application immediately.
+              </Text>
+              <TouchableOpacity style={styles.modalButton} onPress={() => setTermsModalVisible(false)}>
+                <Text style={styles.modalButtonText}>Close</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </LinearGradient>
         </View>
       </Modal>
 
@@ -246,16 +302,36 @@ const Dashboard: React.FC = () => {
         onRequestClose={() => setPremiumModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Premium Features</Text>
-            <Text style={styles.modalSubtitle}>Unlock advanced agricultural insights:</Text>
-            <Text style={styles.modalText}>• Detailed NPK analysis</Text>
-            <Text style={styles.modalText}>• Real-time pH monitoring</Text>
-            <Text style={styles.modalText}>• Precise soil moisture tracking</Text>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setPremiumModalVisible(false)}>
-              <Text style={styles.modalButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
+          <LinearGradient colors={[COLORS.background.start, COLORS.background.end]} style={styles.modalContent}>
+            <ScrollView>
+              <Text style={styles.modalTitle}>Premium Features</Text>
+              <MaterialCommunityIcons name="star-circle" size={50} color={COLORS.accent} style={styles.modalIcon} />
+              <Text style={styles.modalSubtitle}>Unlock advanced agricultural insights:</Text>
+              <View style={styles.premiumFeature}>
+                <MaterialCommunityIcons name="molecule" size={24} color={COLORS.accent} />
+                <Text style={styles.modalText}>• Detailed NPK analysis with historical trends</Text>
+              </View>
+              <View style={styles.premiumFeature}>
+                <MaterialCommunityIcons name="ph" size={24} color={COLORS.accent} />
+                <Text style={styles.modalText}>• Real-time pH monitoring with alerts</Text>
+              </View>
+              <View style={styles.premiumFeature}>
+                <MaterialCommunityIcons name="water-percent" size={24} color={COLORS.accent} />
+                <Text style={styles.modalText}>• Precise soil moisture tracking and irrigation recommendations</Text>
+              </View>
+              <View style={styles.premiumFeature}>
+                <MaterialCommunityIcons name="weather-cloudy" size={24} color={COLORS.accent} />
+                <Text style={styles.modalText}>• Advanced weather forecasts tailored for agriculture</Text>
+              </View>
+              <View style={styles.premiumFeature}>
+                <MaterialCommunityIcons name="chart-line" size={24} color={COLORS.accent} />
+                <Text style={styles.modalText}>• Yield prediction and optimization suggestions</Text>
+              </View>
+              <TouchableOpacity style={styles.modalButton} onPress={() => setPremiumModalVisible(false)}>
+                <Text style={styles.modalButtonText}>Close</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </LinearGradient>
         </View>
       </Modal>
 
@@ -267,15 +343,39 @@ const Dashboard: React.FC = () => {
         onRequestClose={() => setAboutUsModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>About CropCore-Tech</Text>
-            <Text style={styles.modalText}>
-              CropCore-Tech is a cutting-edge mobile application designed to empower farmers with real-time agricultural insights and data-driven decision-making tools. Our mission is to revolutionize farming practices by leveraging technology to increase crop yields, optimize resource usage, and promote sustainable agriculture.
-            </Text>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setAboutUsModalVisible(false)}>
-              <Text style={styles.modalButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
+          <LinearGradient colors={[COLORS.background.start, COLORS.background.end]} style={styles.modalContent}>
+            <ScrollView>
+              <Text style={styles.modalTitle}>About CropCore-Tech</Text>
+              <MaterialCommunityIcons name="sprout" size={50} color={COLORS.accent} style={styles.modalIcon} />
+              <Text style={styles.modalText}>
+                CropCore-Tech is a cutting-edge mobile application designed to empower farmers with real-time agricultural insights and data-driven decision-making tools. Our mission is to revolutionize farming practices by leveraging technology to increase crop yields, optimize resource usage, and promote sustainable agriculture.
+              </Text>
+              <Text style={styles.modalSubtitle}>Our Vision</Text>
+              <Text style={styles.modalText}>
+                To create a world where every farmer has access to advanced agricultural technology, enabling them to produce more with less, while preserving our planet's resources for future generations.
+              </Text>
+              <Text style={styles.modalSubtitle}>Key Features</Text>
+              <View style={styles.aboutUsFeature}>
+                <MaterialCommunityIcons name="chart-bar" size={24} color={COLORS.accent} />
+                <Text style={styles.modalText}>• Real-time crop monitoring and analytics</Text>
+              </View>
+              <View style={styles.aboutUsFeature}>
+                <MaterialCommunityIcons name="robot" size={24} color={COLORS.accent} />
+                <Text style={styles.modalText}>• AI-powered recommendations for optimal farm management</Text>
+              </View>
+              <View style={styles.aboutUsFeature}>
+                <MaterialCommunityIcons name="earth" size={24} color={COLORS.accent} />
+                <Text style={styles.modalText}>• Integration with satellite imagery and weather data</Text>
+              </View>
+              <View style={styles.aboutUsFeature}>
+                <MaterialCommunityIcons name="account-group" size={24} color={COLORS.accent} />
+                <Text style={styles.modalText}>• Community features for knowledge sharing among farmers</Text>
+              </View>
+              <TouchableOpacity style={styles.modalButton} onPress={() => setAboutUsModalVisible(false)}>
+                <Text style={styles.modalButtonText}>Close</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </LinearGradient>
         </View>
       </Modal>
     </LinearGradient>
@@ -317,12 +417,11 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.menu.itemBorder,
-    backgroundColor: COLORS.primary,
   },
   userAvatar: {
     width: 50,
     height: 50,
-    borderRadius: 25,
+    borderRadius: 26,
     marginRight: 15,
   },
   userName: {
@@ -406,6 +505,22 @@ const styles = StyleSheet.create({
   scrollingMetricUnit: {
     fontSize: 14,
   },
+  mapContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  mapTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text.primary,
+    marginBottom: 10,
+  },
+  map: {
+    height: 200,
+    borderRadius: 10,
+  },
   newsContainer: {
     marginTop: 20,
     marginBottom: 300,
@@ -452,16 +567,16 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 50,
     elevation: 5,
+    marginBottom: 85,
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    marginBottom:30,
+    marginBottom: 30,
   },
   modalContent: {
-    backgroundColor: COLORS.menu.background,
     borderRadius: 20,
     padding: 20,
     width: '90%',
@@ -479,6 +594,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.text.primary,
     marginBottom: 10,
+    marginTop: 15,
   },
   modalText: {
     fontSize: 16,
@@ -492,7 +608,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignSelf: 'center',
     marginTop: 20,
-    marginBottom:40,
+    marginBottom: 40,
   },
   modalButtonText: {
     color: COLORS.text.primary,
@@ -506,6 +622,27 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 20,
   },
+  modalIcon: {
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  premiumFeature: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  aboutUsFeature: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  Billy: {
+    fontSize: 18,
+    color: 'white',
+    marginBottom: 2,
+    lineHeight: 24,
+    marginRight: 100,
+  }
 });
 
 export default Dashboard;
