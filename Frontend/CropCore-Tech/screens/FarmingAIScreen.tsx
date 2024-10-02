@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
@@ -31,20 +31,25 @@ interface CardType {
   icon: string;
   name: string;
   IconComponent: IconComponentType;
+  url: string; // Add a URL field for each card
 }
 
 const FarmingAIScreen: React.FC = () => {
   const cards: CardType[] = [
-    { icon: 'seed', name: 'Plant Suggestion', IconComponent: MaterialCommunityIcons },
-    { icon: 'money-bill-trend-up', name: 'Crop Yield', IconComponent: FontAwesome6 },
-    { icon: 'disease', name: 'Disease Prediction', IconComponent: FontAwesome6 },
-    { icon: 'seedling', name: 'Essential Conditions', IconComponent: FontAwesome6 },
-    { icon: 'spray-can', name: 'Weed Detection', IconComponent: FontAwesome6 },
-    { icon: 'flask', name: 'Soil Fertility', IconComponent: FontAwesome6 },
+    { icon: 'seed', name: 'Plant Suggestion', IconComponent: MaterialCommunityIcons, url: 'http://172.16.45.100:8081' },
+    { icon: 'money-bill-trend-up', name: 'Crop Yield', IconComponent: FontAwesome6, url: 'http://172.16.45.100:8082' },
+    { icon: 'disease', name: 'Disease Prediction', IconComponent: FontAwesome6, url: 'http://172.16.45.100:8083' },
+    { icon: 'seedling', name: 'Essential Conditions', IconComponent: FontAwesome6, url: 'http://172.16.45.100:8084' },
+    { icon: 'spray-can', name: 'Weed Detection', IconComponent: FontAwesome6, url: 'http://172.16.45.100:8085' },
+    { icon: 'flask', name: 'Soil Fertility', IconComponent: FontAwesome6, url: 'http://172.16.45.100:8086' },
   ];
 
+  const handlePress = (url: string) => {
+    Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
+  };
+
   const renderCard = (card: CardType, index: number) => (
-    <TouchableOpacity key={index} style={styles.cardContainer}>
+    <TouchableOpacity key={index} style={styles.cardContainer} onPress={() => handlePress(card.url)}>
       <LinearGradient
         colors={[COLORS.card.start, COLORS.card.end]}
         start={{ x: 0, y: 0 }}

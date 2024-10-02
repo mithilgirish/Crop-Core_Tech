@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, FlatList, Image, Linking, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, FlatList, Linking, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
-import MapView, { Marker } from 'react-native-maps';
+import axios from 'axios'; // Import axios
+import Map from './Map';
+import Menubar from './Menubar';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 // Updated color palette
 const COLORS = {
@@ -33,10 +35,11 @@ const COLORS = {
       end: '#1A237E',
     },
   },
-  map: {
-    background: '#000000',
-    marker: '#FFFF99',
-  },
+};
+
+const openNewsLink = (link: string) => {
+  const fullLink = link.startsWith('http') ? link : `https://www.livemint.com${link}`;
+  Linking.openURL(fullLink).catch(err => console.error("Failed to open URL:", err));
 };
 
 interface MetricCardProps {
@@ -44,7 +47,14 @@ interface MetricCardProps {
   value: number;
   unit: string;
   icon: keyof typeof Feather.glyphMap;
-  color: string;
+}
+
+interface NewsItem {
+  headline: string;
+  link: string;
+  "time to read": string;
+  date: string;
+  img: string;
 }
 
 type DashboardScreenNavigationProp = NavigationProp<ParamListBase>;
@@ -60,24 +70,24 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, unit, icon }) => 
   </LinearGradient>
 );
 
-const MenuItem: React.FC<{ title: string; icon: keyof typeof Feather.glyphMap; onPress: () => void }> = ({ title, icon, onPress }) => (
-  <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-    <Feather name={icon} size={24} color={COLORS.text.primary} />
-    <Text style={styles.menuItemText}>{title}</Text>
-  </TouchableOpacity>
-);
-
 const Dashboard: React.FC = () => {
   const [menuVisible, setMenuVisible] = useState(false);
-  const [chatbotVisible, setChatbotVisible] = useState(false);
-  const [profileModalVisible, setProfileModalVisible] = useState(false);
-  const [termsModalVisible, setTermsModalVisible] = useState(false);
-  const [premiumModalVisible, setPremiumModalVisible] = useState(false);
-  const [aboutUsModalVisible, setAboutUsModalVisible] = useState(false);
+  const [newsData, setNewsData] = useState<NewsItem[]>([]);
   const navigation = useNavigation<DashboardScreenNavigationProp>();
 
+  useEffect(() => {
+    // Fetch news data from the API
+    axios.get('http://172.16.45.10:8000/api/News/')
+      .then(response => {
+        setNewsData(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching news data:', error);
+      });
+  }, []);
+
   const toggleMenu = (): void => {
-    setMenuVisible((prev) => !prev);
+    setMenuVisible(prev => !prev);
   };
 
   const toggleChatbot = (): void => {
@@ -85,11 +95,11 @@ const Dashboard: React.FC = () => {
   };
 
   const scrollingMetrics: (MetricCardProps & { id: string })[] = [
-    { id: '1', title: "Nitrogen", value: 180, unit: "ppm", icon: "droplet", color: COLORS.card.start },
-    { id: '2', title: "Phosphorus", value: 150, unit: "ppm", icon: "droplet", color: COLORS.card.start },
-    { id: '3', title: "Potassium", value: 180, unit: "ppm", icon: "droplet", color: COLORS.card.start },
-    { id: '4', title: "pH", value: 6.5, unit: "", icon: "activity", color: COLORS.card.start },
-    { id: '5', title: "Soil Moisture", value: 40, unit: "%", icon: "droplet", color: COLORS.card.start },
+    { id: '1', title: "Nitrogen", value: 180, unit: "ppm", icon: "droplet" },
+    { id: '2', title: "Phosphorus", value: 150, unit: "ppm", icon: "droplet" },
+    { id: '3', title: "Potassium", value: 180, unit: "ppm", icon: "droplet" },
+    { id: '4', title: "pH", value: 6.5, unit: "", icon: "activity" },
+    { id: '5', title: "Soil Moisture", value: 40, unit: "%", icon: "droplet" },
   ];
 
   const renderScrollingMetric = ({ item }: { item: MetricCardProps & { id: string } }) => (
@@ -102,30 +112,6 @@ const Dashboard: React.FC = () => {
       </Text>
     </LinearGradient>
   );
-
-  const handleProfile = () => {
-    setProfileModalVisible(true);
-  };
-
-  const handleTalkToExperts = () => {
-    Linking.openURL('tel:+919940332309');
-  };
-
-  const handleSelectLanguage = () => {
-    // Existing functionality
-  };
-
-  const handleTermsOfUse = () => {
-    setTermsModalVisible(true);
-  };
-
-  const handlePremium = () => {
-    setPremiumModalVisible(true);
-  };
-
-  const handleAboutUs = () => {
-    setAboutUsModalVisible(true);
-  };
 
   return (
     <LinearGradient colors={[COLORS.background.start, COLORS.background.end]} style={styles.backgroundGradient}>
@@ -141,30 +127,14 @@ const Dashboard: React.FC = () => {
         </View>
       )}
 
-      {menuVisible && (
-        <View style={styles.menuContainer}>
-          <LinearGradient colors={[COLORS.menu.header.start, COLORS.menu.header.end]} style={styles.userInfo}>
-            <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/en/b/b7/Billy_Butcher.jpg' }} style={styles.userAvatar} />
-            <Text style={styles.Billy}> Billy butcher</Text>
-            <TouchableOpacity onPress={toggleMenu} style={styles.closeButton}>
-              <Feather name="x" size={24} color={COLORS.text.primary} />
-            </TouchableOpacity>
-          </LinearGradient>
-          <MenuItem title="Profile" icon="user" onPress={handleProfile} />
-          <MenuItem title="Talk to Experts" icon="headphones" onPress={handleTalkToExperts} />
-          <MenuItem title="Select Language" icon="globe" onPress={handleSelectLanguage} />
-          <MenuItem title="Terms of Use" icon="file-text" onPress={handleTermsOfUse} />
-          <MenuItem title="Premium" icon="star" onPress={handlePremium} />
-          <MenuItem title="About Us" icon="info" onPress={handleAboutUs} />
-        </View>
-      )}
+      <Menubar visible={menuVisible} toggleMenu={toggleMenu} />
 
       <ScrollView style={styles.scrollContent}>
         <Text style={styles.greeting}>Hello Billy,</Text>
         <View style={styles.metricsContainer}>
-          <MetricCard title="Temperature" value={25} unit="°C" icon="thermometer" color={COLORS.card.start} />
-          <MetricCard title="Humidity" value={60} unit="%" icon="droplet" color={COLORS.card.start} />
-          <MetricCard title="Light" value={800} unit="lux" icon="sun" color={COLORS.card.start} />
+          <MetricCard title="Temperature" value={25} unit="°C" icon="thermometer" />
+          <MetricCard title="Humidity" value={60} unit="%" icon="droplet" />
+          <MetricCard title="Light" value={800} unit="lux" icon="sun" />
         </View>
         <View style={styles.scrollingMetricsContainer}>
           <FlatList
@@ -177,207 +147,33 @@ const Dashboard: React.FC = () => {
           />
         </View>
 
-        {/* Map Section */}
-        <View style={styles.mapContainer}>
-          <Text style={styles.mapTitle}>Farm Location</Text>
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: 37.78825,
-              longitude: -122.4324,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-            customMapStyle={[
-              {
-                elementType: "geometry",
-                stylers: [
-                  {
-                    color: COLORS.map.background,
-                  },
-                ],
-              },
-              {
-                elementType: "labels.text.stroke",
-                stylers: [
-                  {
-                    color: COLORS.map.background,
-                  },
-                ],
-              },
-              {
-                elementType: "labels.text.fill",
-                stylers: [
-                  {
-                    color: COLORS.map.marker,
-                  },
-                ],
-              },
-            ]}
-          >
-            <Marker
-              coordinate={{ latitude: 37.78825, longitude: -122.4324 }}
-              pinColor={COLORS.map.marker}
-            />
-          </MapView>
-        </View>
+        <Map />
 
         <View style={styles.newsContainer}>
           <View style={styles.newsHeader}>
             <MaterialCommunityIcons name="newspaper-variant-outline" size={24} color={COLORS.text.primary} style={styles.newsIcon} />
             <Text style={styles.newsHeaderText}>Agriculture News</Text>
           </View>
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-            <View key={item} style={styles.newsItem}>
-              <MaterialCommunityIcons name="leaf" size={20} color={COLORS.accent} style={styles.newsItemIcon} />
-              <View>
-                <Text style={styles.newsTitle}>News {item}</Text>
-                <Text style={styles.newsContent}>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                  Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </Text>
-              </View>
-            </View>
-          ))}
+          {newsData.length > 0 ? (
+            newsData.map((item, index) => (
+              <TouchableOpacity key={index} style={styles.newsItem} onPress={() => openNewsLink(item.link)}>
+                <Image source={{ uri: item.img }} style={styles.newsImage} />
+                <View>
+                  <Text style={styles.newsTitle}>{item.headline}</Text>
+                  <Text style={styles.newsContent}>
+                    {item["time to read"]} • {item.date}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={styles.noNewsText}>No news available at the moment.</Text>
+          )}
         </View>
       </ScrollView>
-
       <TouchableOpacity style={styles.chatbotButton} onPress={toggleChatbot}>
         <Feather name="message-circle" size={30} color={COLORS.text.primary} />
       </TouchableOpacity>
-
-      {/* Profile Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={profileModalVisible}
-        onRequestClose={() => setProfileModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>User Profile</Text>
-            <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/en/b/b7/Billy_Butcher.jpg' }} style={styles.modalAvatar} />
-            <Text style={styles.modalText}>Name: Billy Butcher</Text>
-            <Text style={styles.modalText}>Email: billy@gmail.com</Text>
-            <Text style={styles.modalText}>Farm Size: 50 acres</Text>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setProfileModalVisible(false)}>
-              <Text style={styles.modalButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Terms of Use Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={termsModalVisible}
-        onRequestClose={() => setTermsModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <LinearGradient colors={[COLORS.background.start, COLORS.background.end]} style={styles.modalContent}>
-            <ScrollView>
-              <Text style={styles.modalTitle}>Terms of Use</Text>
-              <MaterialCommunityIcons name="file-document-outline" size={50} color={COLORS.accent} style={styles.modalIcon} />
-              <Text style={styles.modalText}>
-                By accessing CropCore-Tech mobile application (henceforth 'the Application' or 'App' or 'CropCore-Tech' interchangeably), which is owned, operated and managed by Team Cache Me (hereinafter referred to as "The Company", "we" or "us"), it is understood that you have read, understood and agree to be bound by the terms of the following user agreement and disclaimers.
-              </Text>
-              <Text style={styles.modalSubtitle}>Acceptance of Terms of Use</Text>
-              <Text style={styles.modalText}>
-                If you do not agree to these terms, please do not install this Mobile Application. Please note that we may change the Terms of Use from time to time. Please review these terms periodically and if you do not agree to any changes made in the terms of use, please stop using the Application immediately.
-              </Text>
-              <TouchableOpacity style={styles.modalButton} onPress={() => setTermsModalVisible(false)}>
-                <Text style={styles.modalButtonText}>Close</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </LinearGradient>
-        </View>
-      </Modal>
-
-      {/* Premium Features Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={premiumModalVisible}
-        onRequestClose={() => setPremiumModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <LinearGradient colors={[COLORS.background.start, COLORS.background.end]} style={styles.modalContent}>
-            <ScrollView>
-              <Text style={styles.modalTitle}>Premium Features</Text>
-              <MaterialCommunityIcons name="star-circle" size={50} color={COLORS.accent} style={styles.modalIcon} />
-              <Text style={styles.modalSubtitle}>Unlock advanced agricultural insights:</Text>
-              <View style={styles.premiumFeature}>
-                <MaterialCommunityIcons name="molecule" size={24} color={COLORS.accent} />
-                <Text style={styles.modalText}>• Detailed NPK analysis with historical trends</Text>
-              </View>
-              <View style={styles.premiumFeature}>
-                <MaterialCommunityIcons name="ph" size={24} color={COLORS.accent} />
-                <Text style={styles.modalText}>• Real-time pH monitoring with alerts</Text>
-              </View>
-              <View style={styles.premiumFeature}>
-                <MaterialCommunityIcons name="water-percent" size={24} color={COLORS.accent} />
-                <Text style={styles.modalText}>• Precise soil moisture tracking and irrigation recommendations</Text>
-              </View>
-              <View style={styles.premiumFeature}>
-                <MaterialCommunityIcons name="weather-cloudy" size={24} color={COLORS.accent} />
-                <Text style={styles.modalText}>• Advanced weather forecasts tailored for agriculture</Text>
-              </View>
-              <View style={styles.premiumFeature}>
-                <MaterialCommunityIcons name="chart-line" size={24} color={COLORS.accent} />
-                <Text style={styles.modalText}>• Yield prediction and optimization suggestions</Text>
-              </View>
-              <TouchableOpacity style={styles.modalButton} onPress={() => setPremiumModalVisible(false)}>
-                <Text style={styles.modalButtonText}>Close</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </LinearGradient>
-        </View>
-      </Modal>
-
-      {/* About Us Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={aboutUsModalVisible}
-        onRequestClose={() => setAboutUsModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <LinearGradient colors={[COLORS.background.start, COLORS.background.end]} style={styles.modalContent}>
-            <ScrollView>
-              <Text style={styles.modalTitle}>About CropCore-Tech</Text>
-              <MaterialCommunityIcons name="sprout" size={50} color={COLORS.accent} style={styles.modalIcon} />
-              <Text style={styles.modalText}>
-                CropCore-Tech is a cutting-edge mobile application designed to empower farmers with real-time agricultural insights and data-driven decision-making tools. Our mission is to revolutionize farming practices by leveraging technology to increase crop yields, optimize resource usage, and promote sustainable agriculture.
-              </Text>
-              <Text style={styles.modalSubtitle}>Our Vision</Text>
-              <Text style={styles.modalText}>
-                To create a world where every farmer has access to advanced agricultural technology, enabling them to produce more with less, while preserving our planet's resources for future generations.
-              </Text>
-              <Text style={styles.modalSubtitle}>Key Features</Text>
-              <View style={styles.aboutUsFeature}>
-                <MaterialCommunityIcons name="chart-bar" size={24} color={COLORS.accent} />
-                <Text style={styles.modalText}>• Real-time crop monitoring and analytics</Text>
-              </View>
-              <View style={styles.aboutUsFeature}>
-                <MaterialCommunityIcons name="robot" size={24} color={COLORS.accent} />
-                <Text style={styles.modalText}>• AI-powered recommendations for optimal farm management</Text>
-              </View>
-              <View style={styles.aboutUsFeature}>
-                <MaterialCommunityIcons name="earth" size={24} color={COLORS.accent} />
-                <Text style={styles.modalText}>• Integration with satellite imagery and weather data</Text>
-              </View>
-              <View style={styles.aboutUsFeature}>
-                <MaterialCommunityIcons name="account-group" size={24} color={COLORS.accent} />
-                <Text style={styles.modalText}>• Community features for knowledge sharing among farmers</Text>
-              </View>
-              <TouchableOpacity style={styles.modalButton} onPress={() => setAboutUsModalVisible(false)}>
-                <Text style={styles.modalButtonText}>Close</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </LinearGradient>
-        </View>
-      </Modal>
     </LinearGradient>
   );
 };
@@ -400,50 +196,6 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     padding: 5,
-  },
-  menuContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    bottom: 0,
-    width: '80%',
-    backgroundColor: COLORS.menu.background,
-    zIndex: 1000,
-    elevation: 5,
-  },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.menu.itemBorder,
-  },
-  userAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 26,
-    marginRight: 15,
-  },
-  userName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.text.primary,
-    flex: 1,
-  },
-  closeButton: {
-    padding: 5,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.menu.itemBorder,
-  },
-  menuItemText: {
-    fontSize: 16,
-    color: COLORS.text.primary,
-    marginLeft: 15,
   },
   scrollContent: {
     paddingHorizontal: 15,
@@ -477,20 +229,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   metricUnit: {
-    fontSize: 14,
+    fontSize: 16,
+    color: COLORS.text.secondary,
   },
   scrollingMetricsContainer: {
-    marginTop: 20,
-  },
-  scrollingMetricsList: {
-    paddingVertical: 10,
+    marginVertical: 20,
   },
   scrollingMetricItem: {
-    width: width * 0.35,
+    flex: 1,
     borderRadius: 10,
     padding: 15,
-    marginHorizontal: 5,
+    marginRight: 10,
     alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120,
   },
   scrollingMetricTitle: {
     fontSize: 16,
@@ -503,27 +255,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   scrollingMetricUnit: {
-    fontSize: 14,
-  },
-  mapContainer: {
-    marginTop: 20,
-    marginBottom: 20,
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  mapTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.text.primary,
-    marginBottom: 10,
-  },
-  map: {
-    height: 200,
-    borderRadius: 10,
+    fontSize: 16,
+    color: COLORS.text.secondary,
   },
   newsContainer: {
     marginTop: 20,
-    marginBottom: 300,
   },
   newsHeader: {
     flexDirection: 'row',
@@ -531,7 +267,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   newsIcon: {
-    marginRight: 10,
+    marginRight: 5,
   },
   newsHeaderText: {
     fontSize: 18,
@@ -540,109 +276,43 @@ const styles = StyleSheet.create({
   },
   newsItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    backgroundColor: COLORS.menu.background,
-    borderRadius: 10,
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.menu.itemBorder,
   },
-  newsItemIcon: {
+  newsImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 5,
     marginRight: 10,
   },
   newsTitle: {
     fontSize: 16,
-    color: COLORS.text.primary,
     fontWeight: 'bold',
+    color: COLORS.text.primary,
   },
   newsContent: {
     fontSize: 14,
     color: COLORS.text.secondary,
   },
+  noNewsText: {
+    textAlign: 'center',
+    color: COLORS.text.secondary,
+    marginTop: 10,
+  },
   chatbotButton: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 50,
     right: 20,
-    backgroundColor: COLORS.accent,
-    padding: 15,
-    borderRadius: 50,
-    elevation: 5,
-    marginBottom: 85,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    marginBottom: 30,
-  },
-  modalContent: {
-    borderRadius: 20,
-    padding: 20,
-    width: '90%',
-    maxHeight: '80%',
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.text.primary,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  modalSubtitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.text.primary,
-    marginBottom: 10,
-    marginTop: 15,
-  },
-  modalText: {
-    fontSize: 16,
-    color: COLORS.text.secondary,
-    marginBottom: 10,
-    lineHeight: 24,
-  },
-  modalButton: {
     backgroundColor: COLORS.primary,
-    padding: 10,
-    borderRadius: 5,
-    alignSelf: 'center',
-    marginTop: 20,
-    marginBottom: 40,
-  },
-  modalButtonText: {
-    color: COLORS.text.primary,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalAvatar: {
-    width: 100,
-    height: 100,
     borderRadius: 50,
-    alignSelf: 'center',
-    marginBottom: 20,
+    padding: 15,
+    marginBottom: 70,
   },
-  modalIcon: {
-    alignSelf: 'center',
-    marginBottom: 20,
+  scrollingMetricsList: {
+    paddingVertical: 10,
   },
-  premiumFeature: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  aboutUsFeature: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  Billy: {
-    fontSize: 18,
-    color: 'white',
-    marginBottom: 2,
-    lineHeight: 24,
-    marginRight: 100,
-  }
 });
 
 export default Dashboard;
+
