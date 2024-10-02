@@ -7,10 +7,17 @@ const COLORS = {
     primary: '#FFFFFF',
   },
   map: {
-    background: '#000000',
-    marker: '#FFFF99',
+    background: '#1E1E1E',
+    road: '#454545',
+    marker: '#FFFF99', // Yellow for nearby farmers
+    roadText: '#FFFFFF',
   },
 };
+
+const nearbyFarmers = [
+  { latitude: 12.850767, longitude: 80.160785, name: 'Farmer 1' }, // Farmer 1 further north
+  { latitude: 12.830567, longitude: 80.140885, name: 'Farmer 2' }, // Farmer 2 further south
+];
 
 const Map: React.FC = () => {
   return (
@@ -19,14 +26,14 @@ const Map: React.FC = () => {
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: 37.78825,
-          longitude: -122.4324,
+          latitude: 12.840767,
+          longitude: 80.153385,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
         customMapStyle={[
           {
-            elementType: "geometry",
+            elementType: 'geometry',
             stylers: [
               {
                 color: COLORS.map.background,
@@ -34,27 +41,68 @@ const Map: React.FC = () => {
             ],
           },
           {
-            elementType: "labels.text.stroke",
+            elementType: 'labels.text.stroke',
             stylers: [
               {
-                color: COLORS.map.background,
+                color: '#000000',
               },
             ],
           },
           {
-            elementType: "labels.text.fill",
+            elementType: 'labels.text.fill',
             stylers: [
               {
-                color: COLORS.map.marker,
+                color: COLORS.map.roadText,
+              },
+            ],
+          },
+          {
+            featureType: 'road',
+            elementType: 'geometry',
+            stylers: [
+              {
+                color: COLORS.map.road,
+              },
+            ],
+          },
+          {
+            featureType: 'road',
+            elementType: 'labels.text.fill',
+            stylers: [
+              {
+                color: COLORS.map.roadText,
+              },
+            ],
+          },
+          {
+            featureType: 'road',
+            elementType: 'labels.text.stroke',
+            stylers: [
+              {
+                color: '#2E2E2E',
               },
             ],
           },
         ]}
       >
+        {/* Main farm marker in red */}
         <Marker
-          coordinate={{ latitude: 37.78825, longitude: -122.4324 }}
-          pinColor={COLORS.map.marker}
+          coordinate={{ latitude: 12.840767, longitude: 80.153385 }}
+          pinColor='red'
+          title="Main Farm"
+          description="Your farm location"
         />
+        
+        {/* Nearby farmers in yellow */}
+        {nearbyFarmers.map((farmer, index) => (
+          <Marker
+            key={index}
+            coordinate={{ latitude: farmer.latitude, longitude: farmer.longitude }}
+            pinColor={COLORS.map.marker} // Yellow marker for nearby farmers
+            title={farmer.name}
+            description="Nearby farmer"
+          />
+        ))}
       </MapView>
     </View>
   );

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, FlatList, Modal, Linking } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, FlatList, Linking, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
+import axios from 'axios'; // Import axios
 import Map from './Map';
 import Menubar from './Menubar';
 
@@ -36,11 +37,24 @@ const COLORS = {
   },
 };
 
+const openNewsLink = (link: string) => {
+  const fullLink = link.startsWith('http') ? link : `https://www.livemint.com${link}`;
+  Linking.openURL(fullLink).catch(err => console.error("Failed to open URL:", err));
+};
+
 interface MetricCardProps {
   title: string;
   value: number;
   unit: string;
   icon: keyof typeof Feather.glyphMap;
+}
+
+interface NewsItem {
+  headline: string;
+  link: string;
+  "time to read": string;
+  date: string;
+  img: string;
 }
 
 type DashboardScreenNavigationProp = NavigationProp<ParamListBase>;
@@ -58,10 +72,22 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, unit, icon }) => 
 
 const Dashboard: React.FC = () => {
   const [menuVisible, setMenuVisible] = useState(false);
+  const [newsData, setNewsData] = useState<NewsItem[]>([]);
   const navigation = useNavigation<DashboardScreenNavigationProp>();
 
+  useEffect(() => {
+    // Fetch news data from the API
+    axios.get('http://172.16.45.10:8000/api/News/')
+      .then(response => {
+        setNewsData(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching news data:', error);
+      });
+  }, []);
+
   const toggleMenu = (): void => {
-    setMenuVisible((prev) => !prev);
+    setMenuVisible(prev => !prev);
   };
 
   const toggleChatbot = (): void => {
@@ -100,11 +126,8 @@ const Dashboard: React.FC = () => {
           </TouchableOpacity>
         </View>
       )}
-      
-      <Menubar
-        visible={menuVisible}
-        toggleMenu={toggleMenu}
-      />
+
+      <Menubar visible={menuVisible} toggleMenu={toggleMenu} />
 
       <ScrollView style={styles.scrollContent}>
         <Text style={styles.greeting}>Hello Billy,</Text>
@@ -131,18 +154,21 @@ const Dashboard: React.FC = () => {
             <MaterialCommunityIcons name="newspaper-variant-outline" size={24} color={COLORS.text.primary} style={styles.newsIcon} />
             <Text style={styles.newsHeaderText}>Agriculture News</Text>
           </View>
-          {[1, 2, 3, 4, 5].map((item) => (
-            <View key={item} style={styles.newsItem}>
-              <MaterialCommunityIcons name="leaf" size={20} color={COLORS.accent} style={styles.newsItemIcon} />
-              <View>
-                <Text style={styles.newsTitle}>News {item}</Text>
-                <Text style={styles.newsContent}>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                  Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </Text>
-              </View>
-            </View>
-          ))}
+          {newsData.length > 0 ? (
+            newsData.map((item, index) => (
+              <TouchableOpacity key={index} style={styles.newsItem} onPress={() => openNewsLink(item.link)}>
+                <Image source={{ uri: item.img }} style={styles.newsImage} />
+                <View>
+                  <Text style={styles.newsTitle}>{item.headline}</Text>
+                  <Text style={styles.newsContent}>
+                    {item["time to read"]} • {item.date}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={styles.noNewsText}>No news available at the moment.</Text>
+          )}
         </View>
       </ScrollView>
       <TouchableOpacity style={styles.chatbotButton} onPress={toggleChatbot}>
@@ -203,20 +229,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   metricUnit: {
-    fontSize: 14,
+    fontSize: 16,
+    color: COLORS.text.secondary,
   },
   scrollingMetricsContainer: {
-    marginTop: 20,
-  },
-  scrollingMetricsList: {
-    paddingVertical: 10,
+    marginVertical: 20,
   },
   scrollingMetricItem: {
-    width: width * 0.35,
+    flex: 1,
     borderRadius: 10,
     padding: 15,
-    marginHorizontal: 5,
+    marginRight: 10,
     alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120,
   },
   scrollingMetricTitle: {
     fontSize: 16,
@@ -229,11 +255,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   scrollingMetricUnit: {
-    fontSize: 14,
+    fontSize: 16,
+    color: COLORS.text.secondary,
   },
   newsContainer: {
     marginTop: 20,
-    marginBottom: 350,
   },
   newsHeader: {
     flexDirection: 'row',
@@ -241,7 +267,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   newsIcon: {
-    marginRight: 10,
+    marginRight: 5,
   },
   newsHeaderText: {
     fontSize: 18,
@@ -250,35 +276,43 @@ const styles = StyleSheet.create({
   },
   newsItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    backgroundColor: COLORS.menu.background,
-    borderRadius: 10,
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.menu.itemBorder,
   },
-  newsItemIcon: {
+  newsImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 5,
     marginRight: 10,
   },
   newsTitle: {
     fontSize: 16,
-    color: COLORS.text.primary,
     fontWeight: 'bold',
+    color: COLORS.text.primary,
   },
   newsContent: {
     fontSize: 14,
     color: COLORS.text.secondary,
   },
+  noNewsText: {
+    textAlign: 'center',
+    color: COLORS.text.secondary,
+    marginTop: 10,
+  },
   chatbotButton: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 50,
     right: 20,
-    backgroundColor: COLORS.accent,
-    padding: 15,
+    backgroundColor: COLORS.primary,
     borderRadius: 50,
-    elevation: 5,
-    marginBottom:90,
+    padding: 15,
+    marginBottom: 70,
+  },
+  scrollingMetricsList: {
+    paddingVertical: 10,
   },
 });
 
 export default Dashboard;
+
