@@ -73,17 +73,26 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, unit, icon }) => 
 const Dashboard: React.FC = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [newsData, setNewsData] = useState<NewsItem[]>([]);
+  const [readings, setReadings] = useState<{ humidity: number, temperatureC: number, temperatureF: number, moisturePercent: number } | null>(null);
   const navigation = useNavigation<DashboardScreenNavigationProp>();
 
+  // Function to fetch data
+  const fetchData = async () => {
+    try {
+      // Fetch news data from the API
+      const newsResponse = await axios.get('http://172.16.45.10:8000/api/News/');
+      setNewsData(newsResponse.data);
+
+      // Fetch readings from the new API
+      const readingsResponse = await axios.get('http://172.16.44.164/readings');
+      setReadings(readingsResponse.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   useEffect(() => {
-    // Fetch news data from the API
-    axios.get('http://172.16.45.10:8000/api/News/')
-      .then(response => {
-        setNewsData(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching news data:', error);
-      });
+    fetchData(); // Call fetchData when the component mounts
   }, []);
 
   const toggleMenu = (): void => {
@@ -121,6 +130,9 @@ const Dashboard: React.FC = () => {
             <Feather name="menu" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Farm Dashboard 🏡</Text>
+          <TouchableOpacity onPress={fetchData} style={styles.iconButton}>
+            <Feather name="refresh-cw" size={24} color={COLORS.text.primary} />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Community')} style={styles.iconButton}>
             <Feather name="users" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
@@ -132,9 +144,13 @@ const Dashboard: React.FC = () => {
       <ScrollView style={styles.scrollContent}>
         <Text style={styles.greeting}>Hello Billy,</Text>
         <View style={styles.metricsContainer}>
-          <MetricCard title="Temperature" value={25} unit="°C" icon="thermometer" />
-          <MetricCard title="Humidity" value={60} unit="%" icon="droplet" />
-          <MetricCard title="Light" value={800} unit="lux" icon="sun" />
+          {readings && (
+            <>
+              <MetricCard title="Temperature (°C)" value={readings.temperatureC} unit="°C" icon="thermometer" />
+              <MetricCard title="Humidity" value={readings.humidity} unit="%" icon="droplet" />
+              <MetricCard title="Moisture" value={readings.moisturePercent} unit="%" icon="droplet" />
+            </>
+          )}
         </View>
         <View style={styles.scrollingMetricsContainer}>
           <FlatList

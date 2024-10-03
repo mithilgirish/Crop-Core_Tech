@@ -24,7 +24,7 @@ interface MotorData {
   waterFlow: number;
 }
 
-const API_BASE_URL = "http://192.168.0.102:8000/motor/esp32";
+const API_BASE_URL = "http://172.16.45.10:8000/motor/esp32";
 
 const MotorControlApp: React.FC = () => {
   const [motorData, setMotorData] = useState<MotorData>({
