@@ -24,7 +24,25 @@ interface MotorData {
   waterFlow: number;
 }
 
-const API_BASE_URL = "http://172.16.45.10:8000/motor/esp32";
+const API_BASE_URL = "http://192.168.0.102:8000/motor/esp32";
+
+const COLORS = {
+  primary: '#1E88E5',
+  secondary: '#3949AB',
+  accent: '#00ACC1',
+  background: {
+    start: '#1A237E',
+    end: '#121212',
+  },
+  card: {
+    start: '#1E88E5',
+    end: '#0D47A1',
+  },
+  text: {
+    primary: '#FFFFFF',
+    secondary: '#B0BEC5',
+  },
+};
 
 const MotorControlApp: React.FC = () => {
   const [motorData, setMotorData] = useState<MotorData>({
@@ -101,7 +119,7 @@ const MotorControlApp: React.FC = () => {
   const DataDisplay = ({ label, value, unit, iconName }: { label: string; value: number; unit: string; iconName: string }) => (
     <View style={styles.dataRow}>
       <View style={styles.dataLabelContainer}>
-        <Icon name={iconName} size={24} color="#4CAF50" style={styles.dataIcon} />
+        <Icon name={iconName} size={24} color={COLORS.accent} style={styles.dataIcon} />
         <Text style={styles.dataLabel}>{label}:</Text>
       </View>
       <Text style={styles.dataValue}>
@@ -111,76 +129,86 @@ const MotorControlApp: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.card}>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Motor Control</Text>
-            <Icon name="engine" size={30} color="#4CAF50" />
-          </View>
-          <View style={styles.switchContainer}>
-            <Text style={styles.switchLabel}>Motor Status:</Text>
-            <Switch
-              value={motorData.status}
-              onValueChange={toggleMotor}
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
-              thumbColor={motorData.status ? "#f5dd4b" : "#f4f3f4"}
-            />
-          </View>
-          <Text style={[styles.statusText, { color: motorData.status ? '#4CAF50' : '#F44336' }]}>
-            {motorData.status ? 'ON' : 'OFF'}
-          </Text>
-        </View>
+    <LinearGradient colors={[COLORS.background.start, COLORS.background.end]} style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <LinearGradient colors={[COLORS.card.start, COLORS.card.end]} style={styles.card}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>Motor Control</Text>
+              <Icon name="engine" size={30} color={COLORS.accent} />
+            </View>
+            <View style={styles.switchContainer}>
+              <Text style={styles.switchLabel}>Motor Status:</Text>
+              <Switch
+                value={motorData.status}
+                onValueChange={toggleMotor}
+                trackColor={{ false: COLORS.text.secondary, true: COLORS.accent }}
+                thumbColor={motorData.status ? COLORS.primary : COLORS.text.primary}
+              />
+            </View>
+            <Text style={[styles.statusText, { color: motorData.status ? COLORS.accent : COLORS.text.secondary }]}>
+              {motorData.status ? 'ON' : 'OFF'}
+            </Text>
+          </LinearGradient>
 
-        <View style={styles.card}>
-          <Text style={styles.subtitle}>Motor Information</Text>
-          <DataDisplay label="Up Time" value={motorData.upTime} unit="mins" iconName="clock-outline" />
-          <DataDisplay label="Power Used" value={motorData.powerUsed} unit="kWh" iconName="flash" />
-          <DataDisplay label="Total Run Time" value={motorData.totalRunTime} unit="h" iconName="timer-sand" />
-          <DataDisplay label="Total Water Used" value={motorData.waterUsed} unit="L" iconName="water" />
-        </View>
+          <LinearGradient colors={[COLORS.card.start, COLORS.card.end]} style={styles.card}>
+            <Text style={styles.subtitle}>Motor Information</Text>
+            <DataDisplay label="Up Time" value={motorData.upTime} unit="mins" iconName="clock-outline" />
+            <DataDisplay label="Power Used" value={motorData.powerUsed} unit="kWh" iconName="flash" />
+            <DataDisplay label="Total Run Time" value={motorData.totalRunTime} unit="h" iconName="timer-sand" />
+            <DataDisplay label="Total Water Used" value={motorData.waterUsed} unit="L" iconName="water" />
+          </LinearGradient>
 
-        <View style={styles.card}>
-          <Text style={styles.subtitle}>Controls</Text>
-          <Text style={styles.sliderLabel}>Motor Power: {motorData.motorPower.toFixed(0)}%</Text>
-          <TextInput
-            style={styles.textInput}
-            value={motorData.motorPower !== undefined ? motorData.motorPower.toFixed(0) : '0'}
-            onChangeText={(value) => updateMotorPower(value)}
-            keyboardType="numeric"
-          />
-          <Text style={styles.sliderLabel}>Water Flow: {motorData.waterFlow.toFixed(2)} L/s</Text>
-          <TextInput
-            style={styles.textInput}
-            value={(motorData.waterFlow !== undefined ? motorData.waterFlow.toFixed(1) : '0.0')}
-            onChangeText={(value) => updateWaterFlow(value)}
-            keyboardType="numeric"
-          />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          <LinearGradient colors={[COLORS.card.start, COLORS.card.end]} style={styles.card}>
+            <Text style={styles.subtitle}>Controls</Text>
+            <Text style={styles.sliderLabel}>Motor Power: {motorData.motorPower.toFixed(0)}%</Text>
+            <View style={styles.inputContainer}>
+              <Icon name="speedometer" size={24} color={COLORS.accent} style={styles.inputIcon} />
+              <TextInput
+                style={styles.textInput}
+                value={motorData.motorPower !== undefined ? motorData.motorPower.toFixed(0) : '0'}
+                onChangeText={(value) => updateMotorPower(value)}
+                keyboardType="numeric"
+                placeholderTextColor={COLORS.text.secondary}
+              />
+            </View>
+            <Text style={styles.sliderLabel}>Water Flow: {motorData.waterFlow.toFixed(2)} L/s</Text>
+            <View style={styles.inputContainer}>
+              <Icon name="water-pump" size={24} color={COLORS.accent} style={styles.inputIcon} />
+              <TextInput
+                style={styles.textInput}
+                value={(motorData.waterFlow !== undefined ? motorData.waterFlow.toFixed(1) : '0.0')}
+                onChangeText={(value) => updateWaterFlow(value)}
+                keyboardType="numeric"
+                placeholderTextColor={COLORS.text.secondary}
+              />
+            </View>
+          </LinearGradient>
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop:15,
-    backgroundColor: '#E8F5E9',
+  },
+  safeArea: {
+    flex: 1,
   },
   scrollContent: {
     padding: 20,
   },
   card: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 5,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -191,12 +219,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.text.primary,
   },
   subtitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.text.primary,
     marginBottom: 15,
   },
   switchContainer: {
@@ -207,7 +235,7 @@ const styles = StyleSheet.create({
   },
   switchLabel: {
     fontSize: 16,
-    color: '#333',
+    color: COLORS.text.primary,
   },
   statusText: {
     fontSize: 24,
@@ -226,30 +254,39 @@ const styles = StyleSheet.create({
   },
   dataLabel: {
     fontSize: 16,
-    color: '#333',
+    color: COLORS.text.primary,
     marginLeft: 10,
   },
   dataValue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: COLORS.text.primary,
   },
   dataIcon: {
     width: 24,
   },
   sliderLabel: {
     fontSize: 16,
-    color: '#333',
+    color: COLORS.text.primary,
     marginBottom: 5,
   },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
   textInput: {
+    flex: 1,
     height: 40,
-    borderColor: '#4CAF50',
+    borderColor: COLORS.accent,
     borderWidth: 1,
     borderRadius: 5,
-    marginBottom: 15,
     paddingHorizontal: 10,
     fontSize: 16,
+    color: COLORS.text.primary,
   },
 });
 

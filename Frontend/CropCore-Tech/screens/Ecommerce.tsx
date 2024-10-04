@@ -10,6 +10,7 @@ import {
   StatusBar,
   Modal,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -17,9 +18,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 type Product = {
   id: string;
   name: string;
-  price: string;
+  price: number;
   imageUrl: string;
   category: string;
+  description: string;
 };
 
 type Category = {
@@ -27,18 +29,22 @@ type Category = {
   name: string;
 };
 
+type CartItem = Product & {
+  quantity: number;
+};
+
 // Constants
 const COLORS = {
-  primary: '#1E88E5',
-  secondary: '#3949AB',
+  primary: '#1fa6a4',
+  secondary: '#27489c',
   accent: '#00ACC1',
   background: {
-    start: '#1A237E',
-    end: '#121212',
+    start: 'black',
+    end: '#a6701f',
   },
   card: {
-    start: '#1E88E5',
-    end: '#0D47A1',
+    start: '#3c9e60',
+    end: '#1d452c',
   },
   text: {
     primary: '#FFFFFF',
@@ -55,38 +61,23 @@ const CATEGORIES: Category[] = [
 ];
 
 const PRODUCTS: Product[] = [
-  // Vegetables
-  { id: 'product-1', name: 'Carrot', price: '₹75', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Fresh_orange_carrots.jpg', category: 'vegetables' },
-  { id: 'product-2', name: 'Broccoli', price: '₹120', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fb/Broccoli_bunches.jpg', category: 'vegetables' },
-  { id: 'product-3', name: 'Tomato', price: '₹60', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Tomato.jpg', category: 'vegetables' },
-  { id: 'product-4', name: 'Spinach', price: '₹40', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e9/Collard-Greens-Bundle.jpg', category: 'vegetables' },
-  { id: 'product-5', name: 'Bell Pepper', price: '₹80', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/49/Bell_Pepper.jpg', category: 'vegetables' },
-  // Fruits
-  { id: 'product-6', name: 'Apple', price: '₹100', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f4/Honeycrisp.jpg', category: 'fruits' },
-  { id: 'product-7', name: 'Banana', price: '₹50', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/31/Cavendish_banana_from_Maracaibo.jpg', category: 'fruits' },
-  { id: 'product-8', name: 'Orange', price: '₹80', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Nagpur_orange_article.JPG', category: 'fruits' },
-  { id: 'product-9', name: 'Strawberry', price: '₹200', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e1/Strawberries.jpg', category: 'fruits' },
-  { id: 'product-10', name: 'Blueberry', price: '₹250', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/15/Blueberries.jpg', category: 'fruits' },
-  // Seeds
-  { id: 'product-11', name: 'Sunflower Seeds', price: '₹150', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Sunflower_seeds.JPG', category: 'seeds' },
-  { id: 'product-12', name: 'Pumpkin Seeds', price: '₹180', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/14/Pumpkin_Seeds_%28matured%29.jpg', category: 'seeds' },
-  { id: 'product-13', name: 'Chia Seeds', price: '₹220', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Seed_of_chia_%28Salvia_hispanica%29Salvia_hispanica_group.jpg', category: 'seeds' },
-  { id: 'product-14', name: 'Flax Seeds', price: '₹200', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Brown_Flax_Seeds.jpg', category: 'seeds' },
-  { id: 'product-15', name: 'Sesame Seeds', price: '₹130', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Sesame-Seeds.jpg', category: 'seeds' },
-  // Supplies
-  { id: 'product-16', name: 'Garden Gloves', price: '₹350', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Trockenhandschuh.jpg', category: 'supplies' },
-  { id: 'product-17', name: 'Watering Can', price: '₹450', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Green_watering_can.jpg', category: 'supplies' },
-  { id: 'product-18', name: 'Pruning Shears', price: '₹400', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Secateur_ouvert.jpg/800px-Secateur_ouvert.jpg', category: 'supplies' },
-  { id: 'product-19', name: 'Plant Food', price: '₹250', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Les_Plantes_Cultivades._Cereals._Imatge_119.jpg', category: 'supplies' },
-  { id: 'product-20', name: 'Garden Trowel', price: '₹300', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Dreieckskelle.JPG', category: 'supplies' },
+  { id: 'product-1', name: 'Carrot', price: 75, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Fresh_orange_carrots.jpg', category: 'vegetables', description: 'Fresh, organic carrots' },
+  { id: 'product-2', name: 'Broccoli', price: 120, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fb/Broccoli_bunches.jpg', category: 'vegetables', description: 'Nutrient-rich broccoli' },
+  { id: 'product-3', name: 'Carrot', price: 75, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Fresh_orange_carrots.jpg', category: 'vegetables', description: 'Fresh, organic carrots' },
+  // ... Add more products with the same structure
 ];
 
 // Components
-const Header: React.FC<{ onCartPress: () => void }> = ({ onCartPress }) => (
+const Header: React.FC<{ cartItemCount: number; onCartPress: () => void }> = ({ cartItemCount, onCartPress }) => (
   <View style={styles.header}>
     <Text style={styles.logo}>Crop Core Market 🛍</Text>
-    <TouchableOpacity onPress={onCartPress}>
+    <TouchableOpacity onPress={onCartPress} style={styles.cartButton}>
       <Text style={styles.icon}>🛒</Text>
+      {cartItemCount > 0 && (
+        <View style={styles.cartBadge}>
+          <Text style={styles.cartBadgeText}>{cartItemCount}</Text>
+        </View>
+      )}
     </TouchableOpacity>
   </View>
 );
@@ -96,30 +87,39 @@ const CategoryFilter: React.FC<{
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
 }> = ({ categories, selectedCategory, onSelectCategory }) => (
-  <View style={styles.categoryContainer}>
-    {categories.map((category) => (
+  <FlatList
+    horizontal
+    showsHorizontalScrollIndicator={false}
+    data={categories}
+    renderItem={({ item }) => (
       <TouchableOpacity
-        key={category.id}
         style={[
           styles.categoryButton,
-          selectedCategory === category.id && styles.selectedCategoryButton,
+          selectedCategory === item.id && styles.selectedCategoryButton,
         ]}
-        onPress={() => onSelectCategory(category.id)}
+        onPress={() => onSelectCategory(item.id)}
       >
         <Text
           style={[
             styles.categoryButtonText,
-            selectedCategory === category.id && styles.selectedCategoryButtonText,
+            selectedCategory === item.id && styles.selectedCategoryButtonText,
           ]}
         >
-          {category.name}
+          {item.name}
         </Text>
       </TouchableOpacity>
-    ))}
-  </View>
+    )}
+    keyExtractor={(item) => item.id}
+    contentContainerStyle={styles.categoryContainer}
+  />
 );
 
-const ProductCard: React.FC<{ product: Product; onPress: () => void }> = ({ product, onPress }) => (
+const ProductCard: React.FC<{
+  product: Product;
+  onPress: () => void;
+  onAddToCart: () => void;
+  isInCart: boolean;
+}> = ({ product, onPress, onAddToCart, isInCart }) => (
   <TouchableOpacity onPress={onPress} style={styles.productCard}>
     <LinearGradient
       colors={[COLORS.card.start, COLORS.card.end]}
@@ -127,12 +127,25 @@ const ProductCard: React.FC<{ product: Product; onPress: () => void }> = ({ prod
     >
       <Image source={{ uri: product.imageUrl }} style={styles.productImage} />
       <Text style={styles.productName}>{product.name}</Text>
-      <Text style={styles.productPrice}>{product.price}</Text>
+      <Text style={styles.productPrice}>₹{product.price}</Text>
+      <TouchableOpacity
+        style={[styles.addToCartButton, isInCart && styles.removeFromCartButton]}
+        onPress={onAddToCart}
+      >
+        <Text style={styles.addToCartButtonText}>
+          {isInCart ? 'Remove from Cart' : 'Add to Cart'}
+        </Text>
+      </TouchableOpacity>
     </LinearGradient>
   </TouchableOpacity>
 );
 
-const ProductModal: React.FC<{ product: Product | null; onClose: () => void }> = ({ product, onClose }) => {
+const ProductModal: React.FC<{
+  product: Product | null;
+  onClose: () => void;
+  onAddToCart: () => void;
+  isInCart: boolean;
+}> = ({ product, onClose, onAddToCart, isInCart }) => {
   if (!product) return null;
 
   return (
@@ -150,8 +163,16 @@ const ProductModal: React.FC<{ product: Product | null; onClose: () => void }> =
           >
             <Image source={{ uri: product.imageUrl }} style={styles.modalProductImage} />
             <Text style={styles.modalProductName}>{product.name}</Text>
-            <Text style={styles.modalProductPrice}>{product.price}</Text>
-            <Text style={styles.modalProductCategory}>Category: {product.category}</Text>
+            <Text style={styles.modalProductPrice}>₹{product.price}</Text>
+            <Text style={styles.modalProductDescription}>{product.description}</Text>
+            <TouchableOpacity
+              style={[styles.modalAddToCartButton, isInCart && styles.modalRemoveFromCartButton]}
+              onPress={onAddToCart}
+            >
+              <Text style={styles.addToCartButtonText}>
+                {isInCart ? 'Remove from Cart' : 'Add to Cart'}
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
@@ -162,8 +183,14 @@ const ProductModal: React.FC<{ product: Product | null; onClose: () => void }> =
   );
 };
 
-const CartModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ visible, onClose }) => {
-  const cartItems = PRODUCTS.slice(0, 5); // Simulating 5 items in cart
+const CartModal: React.FC<{
+  visible: boolean;
+  onClose: () => void;
+  cartItems: CartItem[];
+  onUpdateQuantity: (productId: string, change: number) => void;
+  onRemoveFromCart: (productId: string) => void;
+}> = ({ visible, onClose, cartItems, onUpdateQuantity, onRemoveFromCart }) => {
+  const totalAmount = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
     <Modal
@@ -179,19 +206,58 @@ const CartModal: React.FC<{ visible: boolean; onClose: () => void }> = ({ visibl
             style={styles.modalGradient}
           >
             <Text style={styles.modalTitle}>Your Cart</Text>
-            <FlatList
-              data={cartItems}
-              renderItem={({ item }) => (
-                <View style={styles.cartItem}>
-                  <Image source={{ uri: item.imageUrl }} style={styles.cartItemImage} />
-                  <View style={styles.cartItemInfo}>
-                    <Text style={styles.cartItemName}>{item.name}</Text>
-                    <Text style={styles.cartItemPrice}>{item.price}</Text>
+            {cartItems.length === 0 ? (
+              <Text style={styles.emptyCartText}>Your cart is empty</Text>
+            ) : (
+              <FlatList
+                data={cartItems}
+                renderItem={({ item }) => (
+                  <View style={styles.cartItem}>
+                    <Image source={{ uri: item.imageUrl }} style={styles.cartItemImage} />
+                    <View style={styles.cartItemInfo}>
+                      <Text style={styles.cartItemName}>{item.name}</Text>
+                      <Text style={styles.cartItemPrice}>₹{item.price}</Text>
+                      <View style={styles.quantityContainer}>
+                        <TouchableOpacity
+                          onPress={() => onUpdateQuantity(item.id, -1)}
+                          style={styles.quantityButton}
+                        >
+                          <Text style={styles.quantityButtonText}>-</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.quantityText}>{item.quantity}</Text>
+                        <TouchableOpacity
+                          onPress={() => onUpdateQuantity(item.id, 1)}
+                          style={styles.quantityButton}
+                        >
+                          <Text style={styles.quantityButtonText}>+</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => onRemoveFromCart(item.id)}
+                          style={styles.removeButton}
+                        >
+                          <Text style={styles.removeButtonText}>Remove</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                   </View>
-                </View>
-              )}
-              keyExtractor={(item) => item.id}
-            />
+                )}
+                keyExtractor={(item) => item.id}
+              />
+            )}
+            {cartItems.length > 0 && (
+              <View style={styles.totalContainer}>
+                <Text style={styles.totalText}>Total: ₹{totalAmount}</Text>
+                <TouchableOpacity
+                  style={styles.checkoutButton}
+                  onPress={() => {
+                    Alert.alert('Order Placed', 'Thank you for your order!');
+                    onClose();
+                  }}
+                >
+                  <Text style={styles.checkoutButtonText}>Checkout</Text>
+                </TouchableOpacity>
+              </View>
+            )}
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
@@ -206,12 +272,40 @@ const AgricultureEcommerceScreen: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [cartVisible, setCartVisible] = useState<boolean>(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   const filteredProducts = useMemo(() => {
     return selectedCategory === 'all'
       ? PRODUCTS
       : PRODUCTS.filter((product) => product.category === selectedCategory);
   }, [selectedCategory]);
+
+  const handleAddToCart = (product: Product) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item.id === product.id);
+      if (existingItem) {
+        return prevCart.filter((item) => item.id !== product.id);
+      } else {
+        return [...prevCart, { ...product, quantity: 1 }];
+      }
+    });
+  };
+
+  const handleUpdateQuantity = (productId: string, change: number) => {
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === productId
+          ? { ...item, quantity: Math.max(1, item.quantity + change) }
+          : item
+      )
+    );
+  };
+
+  const handleRemoveFromCart = (productId: string) => {
+    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
+  };
+
+  const isInCart = (productId: string) => cart.some((item) => item.id === productId);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -220,7 +314,7 @@ const AgricultureEcommerceScreen: React.FC = () => {
         colors={[COLORS.background.start, COLORS.background.end]}
         style={styles.container}
       >
-        <Header onCartPress={() => setCartVisible(true)} />
+        <Header cartItemCount={cart.length} onCartPress={() => setCartVisible(true)} />
         <CategoryFilter
           categories={CATEGORIES}
           selectedCategory={selectedCategory}
@@ -232,20 +326,33 @@ const AgricultureEcommerceScreen: React.FC = () => {
             <ProductCard
               product={item}
               onPress={() => setSelectedProduct(item)}
+              onAddToCart={() => handleAddToCart(item)}
+              isInCart={isInCart(item.id)}
             />
           )}
           keyExtractor={(item) => item.id}
           numColumns={2}
           contentContainerStyle={styles.productList}
         />
-        <CartModal visible={cartVisible} onClose={() => setCartVisible(false)} />
-        <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+        <CartModal
+          visible={cartVisible}
+          onClose={() => setCartVisible(false)}
+          cartItems={cart}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveFromCart={handleRemoveFromCart}
+        />
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          onAddToCart={() => selectedProduct && handleAddToCart(selectedProduct)}
+          isInCart={selectedProduct ? isInCart(selectedProduct.id) : false}
+        />
       </LinearGradient>
     </SafeAreaView>
   );
 };
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.background.start,
@@ -264,21 +371,37 @@ const style = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.text.primary,
   },
+  cartButton: {
+    position: 'relative',
+  },
   icon: {
     fontSize: 24,
   },
+  cartBadge: {
+    position: 'absolute',
+    right: -6,
+    top: -6,
+    backgroundColor: COLORS.accent,
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cartBadgeText: {
+    color: COLORS.text.primary,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   categoryContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: COLORS.background.start,
+    paddingHorizontal: 8,
   },
   categoryButton: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     backgroundColor: COLORS.secondary,
+    marginHorizontal: 4,
   },
   selectedCategoryButton: {
     backgroundColor: COLORS.accent,
@@ -286,7 +409,6 @@ const style = StyleSheet.create({
   categoryButtonText: {
     color: COLORS.text.primary,
     fontWeight: 'bold',
-    fontSize: 14,
   },
   selectedCategoryButtonText: {
     color: COLORS.text.primary,
@@ -318,89 +440,20 @@ const style = StyleSheet.create({
   productPrice: {
     fontSize: 14,
     color: COLORS.text.secondary,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: 80}
-  })
-  const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.background.start,
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-  },
-  logo: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.text.primary,
-  },
-  icon: {
-    fontSize: 24,
-  },
-  categoryContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: COLORS.background.start,
-  },
-  categoryButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: COLORS.secondary,
-  },
-  selectedCategoryButton: {
-    backgroundColor: COLORS.accent,
-  },
-  categoryButtonText: {
-    color: COLORS.text.primary,
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  selectedCategoryButtonText: {
-    color: COLORS.text.primary,
-  },
-  productList: {
-    padding: 8,
-  },
-  productCard: {
-    flex: 1,
-    margin: 8,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  cardGradient: {
-    padding: 12,
-  },
-  productImage: {
-    width: '100%',
-    height: 120,
-    borderRadius: 4,
     marginBottom: 8,
   },
-  productName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: COLORS.text.primary,
-    marginBottom: 4,
+  addToCartButton: {
+    backgroundColor: COLORS.accent,
+    paddingVertical: 8,
+    borderRadius: 4,
+    alignItems: 'center',
   },
-  productPrice: {
-    fontSize: 14,
-    color: COLORS.text.secondary,
+  removeFromCartButton: {
+    backgroundColor: '#D32F2F',
+  },
+  addToCartButtonText: {
+    color: COLORS.text.primary,
+    fontWeight: 'bold',
   },
   modalOverlay: {
     flex: 1,
@@ -409,7 +462,7 @@ const style = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
+    width: '90%',
     maxHeight: '80%',
     borderRadius: 10,
     overflow: 'hidden',
@@ -440,19 +493,31 @@ const style = StyleSheet.create({
     color: COLORS.text.secondary,
     marginBottom: 8,
   },
-  modalProductCategory: {
+  modalProductDescription: {
     fontSize: 16,
     color: COLORS.text.secondary,
     marginBottom: 16,
   },
+  modalAddToCartButton: {
+    backgroundColor: COLORS.accent,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  modalRemoveFromCartButton: {
+    backgroundColor: '#D32F2F',
+  },
   cartItem: {
     flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    padding: 8,
   },
   cartItemImage: {
-    width: 50,
-    height: 50,
+    width: 80,
+    height: 80,
     borderRadius: 4,
     marginRight: 12,
   },
@@ -463,14 +528,79 @@ const style = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: COLORS.text.primary,
+    marginBottom: 4,
   },
   cartItemPrice: {
     fontSize: 14,
     color: COLORS.text.secondary,
+    marginBottom: 8,
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  quantityButton: {
+    backgroundColor: COLORS.secondary,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quantityButtonText: {
+    color: COLORS.text.primary,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  quantityText: {
+    color: COLORS.text.primary,
+    fontSize: 16,
+    marginHorizontal: 12,
+  },
+  removeButton: {
+    backgroundColor: '#D32F2F',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 4,
+    marginLeft: 12,
+  },
+  removeButtonText: {
+    color: COLORS.text.primary,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  emptyCartText: {
+    color: COLORS.text.secondary,
+    fontSize: 16,
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+  totalContainer: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    paddingTop: 16,
+    marginTop: 16,
+  },
+  totalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text.primary,
+    marginBottom: 12,
+  },
+  checkoutButton: {
+    backgroundColor: COLORS.accent,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  checkoutButtonText: {
+    color: COLORS.text.primary,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   closeButton: {
-    backgroundColor: COLORS.accent,
-    padding: 12,
+    backgroundColor: COLORS.secondary,
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 16,
