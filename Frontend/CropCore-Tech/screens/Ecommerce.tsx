@@ -35,16 +35,16 @@ type CartItem = Product & {
 
 // Constants
 const COLORS = {
-  primary: '#1fa6a4',
-  secondary: '#27489c',
-  accent: '#00ACC1',
+  primary: '#1E88E5',
+  secondary: '#3949AB',
+  accent: '#297d65',
   background: {
     start: 'black',
-    end: '#a6701f',
+    end: '#dba614',
   },
   card: {
-    start: '#3c9e60',
-    end: '#1d452c',
+    start: '#dbc51a',
+    end: '#2d5203',
   },
   text: {
     primary: '#FFFFFF',
@@ -61,12 +61,64 @@ const CATEGORIES: Category[] = [
 ];
 
 const PRODUCTS: Product[] = [
-  { id: 'product-1', name: 'Carrot', price: 75, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Fresh_orange_carrots.jpg', category: 'vegetables', description: 'Fresh, organic carrots' },
-  { id: 'product-2', name: 'Broccoli', price: 120, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fb/Broccoli_bunches.jpg', category: 'vegetables', description: 'Nutrient-rich broccoli' },
-  { id: 'product-3', name: 'Carrot', price: 75, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Fresh_orange_carrots.jpg', category: 'vegetables', description: 'Fresh, organic carrots' },
-  // ... Add more products with the same structure
-];
+  // Vegetables
+  { id: 'veg-1', name: 'Tomato', price: 40, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/88/Bright_red_tomato_and_cross_section02.jpg', category: 'vegetables', description: 'Fresh, ripe tomatoes perfect for salads and cooking' },
+  { id: 'veg-2', name: 'Potato', price: 30, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Patates.jpg', category: 'vegetables', description: 'Versatile potatoes ideal for various dishes' },
+  { id: 'veg-3', name: 'Onion', price: 35, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/25/Onion_on_White.JPG', category: 'vegetables', description: 'Essential cooking ingredient with strong flavor' },
+  { id: 'veg-4', name: 'Cabbage', price: 45, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Cabbage_and_cross_section_on_white.jpg', category: 'vegetables', description: 'Crisp, fresh cabbage for salads and cooking' },
+  { id: 'veg-5', name: 'Cauliflower', price: 50, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Chou-fleur_02.jpg', category: 'vegetables', description: 'White, tender cauliflower florets' },
+  { id: 'veg-6', name: 'Brinjal', price: 40, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/76/Solanum_melongena_24_08_2012_%281%29.JPG', category: 'vegetables', description: 'Purple eggplants perfect for various cuisines' },
+  { id: 'veg-7', name: 'Okra', price: 60, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Hong_Kong_Okra_Aug_25_2012.JPG', category: 'vegetables', description: 'Fresh lady fingers for traditional recipes' },
+  { id: 'veg-8', name: 'Carrot', price: 45, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Fresh_orange_carrots.jpg', category: 'vegetables', description: 'Sweet and crunchy orange carrots' },
+  { id: 'veg-9', name: 'Spinach', price: 30, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/37/Spinacia_oleracea_Spinazie_bloeiend.jpg', category: 'vegetables', description: 'Nutrient-rich green leafy vegetable' },
+  { id: 'veg-10', name: 'Radish', price: 35, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/68/India_-_Koyambedu_Market_-_Radishes_01_%283986302317%29.jpg', category: 'vegetables', description: 'Crunchy white radishes' },
+  { id: 'veg-11', name: 'Bitter Gourd', price: 55, imageUrl:'https://upload.wikimedia.org/wikipedia/commons/d/d1/Bittergourd.jpg', category: 'vegetables', description: 'Unique bitter flavor, rich in nutrients' },
+  { id: 'veg-12', name: 'Bottle Gourd', price: 40, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Courge_encore_verte.jpg', category: 'vegetables', description: 'Versatile gourd for various dishes' },
+  { id: 'veg-13', name: 'Cucumber', price: 30, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/96/ARS_cucumber.jpg', category: 'vegetables', description: 'Cool and refreshing cucumbers' },
+  { id: 'veg-14', name: 'Pumpkin', price: 50, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/FrenchMarketPumpkinsB.jpg', category: 'vegetables', description: 'Sweet pumpkin for soups and curries' },
+  { id: 'veg-15', name: 'Peas', price: 70, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/11/Peas_in_pods_-_Studio.jpg', category: 'vegetables', description: 'Sweet green peas in pods' },
 
+  // Fruits
+  { id: 'fruit-1', name: 'Mango', price: 100, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/90/Hapus_Mango.jpg', category: 'fruits', description: 'Sweet and juicy seasonal mangoes' },
+  { id: 'fruit-2', name: 'Banana', price: 50, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Bananas.jpg', category: 'fruits', description: 'Energy-rich yellow bananas' },
+  { id: 'fruit-3', name: 'Apple', price: 120, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg', category: 'fruits', description: 'Crisp and sweet red apples' },
+  { id: 'fruit-4', name: 'Guava', price: 60, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/02/Guava_ID.jpg', category: 'fruits', description: 'Fresh guavas rich in vitamin C' },
+  { id: 'fruit-5', name: 'Grapes', price: 90, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6c/Abhar-iran.JPG', category: 'fruits', description: 'Sweet seedless grapes' },
+  { id: 'fruit-6', name: 'Papaya', price: 70, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Papaya_cross_section_BNC.jpg', category: 'fruits', description: 'Ripe papayas rich in nutrients' },
+  { id: 'fruit-7', name: 'Pomegranate', price: 130, imageUrl:'https://upload.wikimedia.org/wikipedia/commons/5/51/Pomegranate_%28opened%29.jpg', category: 'fruits', description: 'Ruby red pomegranate with juicy arils' },
+  { id: 'fruit-8', name: 'Orange', price: 80, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Orange-Whole-%26-Split.jpg', category: 'fruits', description: 'Juicy citrus oranges' },
+  { id: 'fruit-9', name: 'Lemon', price: 40, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Lemon.jpg', category: 'fruits', description: 'Tangy yellow lemons' },
+  { id: 'fruit-10', name: 'Watermelon', price: 110, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/47/Taiwan_2009_Tainan_City_Organic_Farm_Watermelon_FRD_7962.jpg', category: 'fruits', description: 'Sweet and refreshing watermelon' },
+  { id: 'fruit-11', name: 'Muskmelon', price: 90, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Muskmelon.jpg', category: 'fruits', description: 'Fragrant and sweet muskmelon' },
+  { id: 'fruit-12', name: 'Pineapple', price: 100, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/cb/Pineapple_and_cross_section.jpg', category: 'fruits', description: 'Tropical sweet pineapple' },
+  { id: 'fruit-13', name: 'Lychee', price: 150, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/46/Litchi_chinensis_fruits.JPG', category: 'fruits', description: 'Sweet and fragrant lychees' },
+  { id: 'fruit-14', name: 'Coconut', price: 60, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Coconut_on_white_background.jpg', category: 'fruits', description: 'Fresh coconuts for water and meat' },
+  { id: 'fruit-15', name: 'Sapota', price: 80, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Chikoo.JPG', category: 'fruits', description: 'Sweet chikoo with unique flavor' },
+
+  // Seeds
+  { id: 'seed-1', name: 'Mustard Seeds', price: 45, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/35/Mustard.png', category: 'seeds', description: 'Essential spice for Indian cooking' },
+  { id: 'seed-2', name: 'Sunflower Seeds', price: 120, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/13/Whole_Sunflower_seed.jpg', category: 'seeds', description: 'Nutritious sunflower seeds for planting' },
+  { id: 'seed-3', name: 'Sesame Seeds', price: 160, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1d/Sesame_in_Hainan_-_05.JPG', category: 'seeds', description: 'Tiny seeds with rich nutty flavor' },
+  { id: 'seed-4', name: 'Groundnut Seeds', price: 100, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Valencia_peanuts.jpg', category: 'seeds', description: 'Quality groundnut seeds for planting' },
+  { id: 'seed-5', name: 'Cotton Seeds', price: 90, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/8d/Cotton.JPG', category: 'seeds', description: 'High-yield cotton seeds' },
+  { id: 'seed-6', name: 'Maize Seeds', price: 80, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/GEM_corn.jpg', category: 'seeds', description: 'Premium corn seeds for planting' },
+  { id: 'seed-7', name: 'Wheat Seeds', price: 70, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Vehn%C3%A4pelto_6.jpg', category: 'seeds', description: 'Quality wheat seeds for sowing' },
+  { id: 'seed-8', name: 'Rice Seeds', price: 85, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0a/20201102.Hengnan.Hybrid_rice_Sanyou-1.6.jpg', category: 'seeds', description: 'High-yielding rice seeds' },
+  { id: 'seed-9', name: 'Soybean Seeds', price: 95, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/32/Bhatmaas.jpg', category: 'seeds', description: 'Protein-rich soybean seeds' },
+  { id: 'seed-10', name: 'Chilli Seeds', price: 110, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/8b/Bhoot_Jolokia_%28_Ghost_Chili_pepper_%29.jpg', category: 'seeds', description: 'Seeds for growing spicy chilies' },
+  { id: 'seed-11', name: 'Coriander Seeds', price: 65, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/86/Coriander_Seeds.jpg', category: 'seeds', description: 'Aromatic coriander seeds' },
+  { id: 'seed-12', name: 'Fenugreek Seeds', price: 55, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/2017_0102_fenugreek_seeds.jpg', category: 'seeds', description: 'Flavorful fenugreek seeds' },
+  { id: 'seed-13', name: 'Cumin Seeds', price: 130, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/11/Black_Cumin.jpg', category: 'seeds', description: 'Essential spice for many cuisines' },
+  { id: 'seed-14', name: 'Jowar Seeds', price: 75, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/84/Sorghum_bicolor03.jpg', category: 'seeds', description: 'Drought-resistant sorghum seeds' },
+  { id: 'seed-15', name: 'Bajra Seeds', price: 70, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Grain_millet%2C_early_grain_fill%2C_Tifton%2C_7-3-02.jpg', category: 'seeds', description: 'Nutritious pearl millet seeds' },
+
+  // Supplies
+  { id: 'supply-1', name: 'Urea Fertilizer', price: 300, imageUrl: 'https://sustainablemacleod.org.au/wp-content/uploads/2022/08/fertilisers-scaled.jpg', category: 'supplies', description: 'Essential nitrogen fertilizer' },
+  { id: 'supply-2', name: 'Organic Pesticide', price: 250, imageUrl: 'https://5.imimg.com/data5/SELLER/Default/2023/8/335947978/GR/KG/VR/183091867/organic-pesticides-1000x1000.jpg', category: 'supplies', description: 'Safe and effective pest control' },
+  { id: 'supply-3', name: 'Drip Irrigation Kit', price: 1500, imageUrl: 'https://c7.alamy.com/comp/2G2JW3R/drip-irrigation-nozzle-in-the-ground-near-the-cucumber-seedling-organic-farming-2G2JW3R.jpg', category: 'supplies', description: 'Water-efficient irrigation system' },
+  { id: 'supply-4', name: 'Seedling Trays', price: 120, imageUrl: 'https://m.media-amazon.com/images/I/71X9UMg6feL._SL1500_.jpg', category: 'supplies', description: 'Perfect for starting seeds' },
+  { id: 'supply-5', name: 'Organic Compost', price: 200, imageUrl: 'https://www.thespruce.com/thmb/zA6ne4fkZnj2MHGt19fX1Ny3iVw=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/SPR-what-is-mushroom-compost-6665515-01_3413-97be9479b42142ba944b64e2c7d5d4d3.jpg', category:'supplies',description: 'Organic manure and compost for plants' },
+];
 // Components
 const Header: React.FC<{ cartItemCount: number; onCartPress: () => void }> = ({ cartItemCount, onCartPress }) => (
   <View style={styles.header}>
